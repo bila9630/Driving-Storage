@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import {
     CaretSortIcon,
     CheckIcon,
@@ -76,14 +77,22 @@ type Team = (typeof groups)[number]["teams"][number]
 
 type PopoverTriggerProps = React.ComponentPropsWithoutRef<typeof PopoverTrigger>
 
-// interface TeamSwitcherProps extends PopoverTriggerProps { }
+interface TeamSwitcherProps extends PopoverTriggerProps {
+    onTeamSwitch: (team: Team) => void
+}
 
-export default function TeamSwitcher({ className }: PopoverTriggerProps) {
+export default function TeamSwitcher({ className, onTeamSwitch }: TeamSwitcherProps) {
     const [open, setOpen] = React.useState(false)
     const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false)
     const [selectedTeam, setSelectedTeam] = React.useState<Team>(
         groups[0].teams[0]
     )
+
+    const handleTeamSelect = (team: Team) => {
+        setSelectedTeam(team)
+        setOpen(false)
+        onTeamSwitch(team)
+    }
 
     return (
         <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
@@ -118,10 +127,7 @@ export default function TeamSwitcher({ className }: PopoverTriggerProps) {
                                     {group.teams.map((team) => (
                                         <CommandItem
                                             key={team.value}
-                                            onSelect={() => {
-                                                setSelectedTeam(team)
-                                                setOpen(false)
-                                            }}
+                                            onSelect={() => handleTeamSelect(team)}
                                             className="text-sm"
                                         >
                                             <Avatar className="mr-2 h-5 w-5">
