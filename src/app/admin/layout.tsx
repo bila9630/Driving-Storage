@@ -1,7 +1,7 @@
 import { MainNav } from '@/components/dashboard/main-nav'
 import TeamSwitcher from '@/components/dashboard/team-switcher'
 import { Search } from '@/components/dashboard/search'
-import { UserNav } from '@/components/dashboard/user-nav'
+import { ModeToggle } from '@/components/dark-mode-toggle'
 import React from 'react'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -13,7 +13,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <MainNav className="mx-6" />
                     <div className="ml-auto flex items-center space-x-4">
                         <Search />
-                        <UserNav />
+                        {/* <UserNav /> */}
+                        <ModeToggle />
                     </div>
                 </div>
             </div>
