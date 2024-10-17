@@ -5,23 +5,36 @@ import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 
+interface MainNavProps extends React.HTMLAttributes<HTMLElement> {
+    userType: 'admin' | 'driver'
+}
+
 export function MainNav({
     className,
+    userType,
     ...props
-}: React.HTMLAttributes<HTMLElement>) {
+}: MainNavProps) {
     const pathname = usePathname()
+
+    const navItems = userType === 'admin'
+        ? [
+            { href: "/admin/overview", label: "Overview" },
+            { href: "/admin/drivers", label: "Drivers" },
+            { href: "/admin/cars", label: "Cars" },
+            { href: "/admin/trips", label: "Trips" },
+        ]
+        : [
+            { href: "/user", label: "Dashboard" },
+            { href: "/user/trips", label: "My Trips" },
+            { href: "/user/profile", label: "Profile" },
+        ]
 
     return (
         <nav
             className={cn("flex items-center space-x-4 lg:space-x-6", className)}
             {...props}
         >
-            {[
-                { href: "/admin/overview", label: "Overview" },
-                { href: "/admin/drivers", label: "Drivers" },
-                { href: "/admin/cars", label: "Cars" },
-                { href: "/admin/trips", label: "Trips" },
-            ].map(({ href, label }) => (
+            {navItems.map(({ href, label }) => (
                 <Link
                     key={href}
                     href={href}
