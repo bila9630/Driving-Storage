@@ -24,7 +24,7 @@ export function MainNav({
             { href: "/admin/trips", label: "Trips" },
         ]
         : [
-            { href: "/user", label: "Dashboard" },
+            { href: "/user/search", label: "Search" },
             { href: "/user/trips", label: "My Trips" },
             { href: "/user/profile", label: "Profile" },
         ]

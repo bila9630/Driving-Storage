@@ -17,7 +17,7 @@ export default function InnerLayout({ children }: { children: React.ReactNode })
         if (team.value === "admin") {
             router.push('/admin/overview')
         } else {
-            router.push('/user')
+            router.push('/user/search')
         }
     }
 
