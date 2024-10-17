@@ -22,6 +22,7 @@ interface Driver {
     location: string
     workingHours: string
     phoneNumber: string
+    email: string
     preferredDrivingTime: ('Morning' | 'Night')[]
 }
 
@@ -42,6 +43,7 @@ export default function DriversPage() {
                     location: 'Frankfurt',
                     workingHours: '40 hours',
                     phoneNumber: '+491524578541',
+                    email: 'john.doe@example.com',
                     preferredDrivingTime: ['Morning', 'Night']
                 },
                 { 
@@ -53,6 +55,7 @@ export default function DriversPage() {
                     location: 'Berlin',
                     workingHours: '35 hours',
                     phoneNumber: '+491765432198',
+                    email: 'jane.smith@example.com',
                     preferredDrivingTime: ['Morning']
                 },
                 { 
@@ -64,6 +67,7 @@ export default function DriversPage() {
                     location: 'Munich',
                     workingHours: '38 hours',
                     phoneNumber: '+491234567890',
+                    email: 'mike.johnson@example.com',
                     preferredDrivingTime: ['Night']
                 },
                 { 
@@ -75,6 +79,7 @@ export default function DriversPage() {
                     location: 'Hamburg',
                     workingHours: '42 hours',
                     phoneNumber: '+499876543210',
+                    email: 'emily.brown@example.com',
                     preferredDrivingTime: ['Morning', 'Night']
                 },
                 { 
@@ -86,6 +91,7 @@ export default function DriversPage() {
                     location: 'Cologne',
                     workingHours: '37 hours',
                     phoneNumber: '+491357924680',
+                    email: 'alex.lee@example.com',
                     preferredDrivingTime: ['Morning']
                 }
             ]
@@ -122,6 +128,7 @@ export default function DriversPage() {
                         <TableHead>Location</TableHead>
                         <TableHead>Working hours</TableHead>
                         <TableHead>Phone Number</TableHead>
+                        <TableHead>Email</TableHead>
                         <TableHead>Preferred Driving Time</TableHead>
                         <TableHead>Actions</TableHead>
                     </TableRow>
@@ -153,6 +160,7 @@ export default function DriversPage() {
                             <TableCell>{driver.location}</TableCell>
                             <TableCell>{driver.workingHours}</TableCell>
                             <TableCell>{driver.phoneNumber}</TableCell>
+                            <TableCell>{driver.email}</TableCell>
                             <TableCell>
                                 <div className="flex space-x-2">
                                     {driver.preferredDrivingTime.includes('Morning') && (

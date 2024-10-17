@@ -49,7 +49,7 @@ import {
 
 const groups = [
     {
-        label: "Personal Account",
+        label: "Admin",
         teams: [
             {
                 label: "Alicia Koch",
@@ -58,14 +58,14 @@ const groups = [
         ],
     },
     {
-        label: "Teams",
+        label: "Driver",
         teams: [
             {
-                label: "Acme Inc.",
+                label: "John Doe",
                 value: "acme-inc",
             },
             {
-                label: "Monsters Inc.",
+                label: "Jane Smith",
                 value: "monsters",
             },
         ],
