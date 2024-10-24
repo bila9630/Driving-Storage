@@ -17,6 +17,8 @@ import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picke
 import { RecentSales } from "@/components/dashboard/recent-sales";
 import { Button } from "@/components/ui/button";
 import { StatsCards } from '@/components/stats-cards';
+import { EnergyOverview } from "@/components/dashboard/energy-overview"
+import { SustainabilityOverview } from "@/components/dashboard/sustainability-overview"
 
 
 export default function AdminOverviewPage() {
@@ -51,6 +53,60 @@ export default function AdminOverviewPage() {
                                 <CardTitle>Recent Contributions</CardTitle>
                                 <CardDescription>
                                     265 drivers contributed this month.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <RecentSales />
+                            </CardContent>
+                        </Card>
+                    </div>
+                </TabsContent>
+
+                {/* SUSTAINABILITY */}
+                <TabsContent value="sustainability" className="space-y-4">
+                    <StatsCards />
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                        <Card className="col-span-4">
+                            <CardHeader>
+                                <CardTitle>Energy Sources Distribution</CardTitle>
+                                <CardDescription>Fleet energy consumption by source</CardDescription>
+                            </CardHeader>
+                            <CardContent className="pl-2">
+                                <SustainabilityOverview />
+                            </CardContent>
+                        </Card>
+                        <Card className="col-span-3">
+                            <CardHeader>
+                                <CardTitle>Green Impact Leaders</CardTitle>
+                                <CardDescription>
+                                    Top contributors to carbon reduction
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <RecentSales />
+                            </CardContent>
+                        </Card>
+                    </div>
+                </TabsContent>
+
+                {/* ENERGY */}
+                <TabsContent value="energy" className="space-y-4">
+                    <StatsCards />
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                        <Card className="col-span-4">
+                            <CardHeader>
+                                <CardTitle>Energy Price Development</CardTitle>
+                                <CardDescription>24-hour price trend</CardDescription>
+                            </CardHeader>
+                            <CardContent className="pl-2">
+                                <EnergyOverview />
+                            </CardContent>
+                        </Card>
+                        <Card className="col-span-3">
+                            <CardHeader>
+                                <CardTitle>Peak Demand Response</CardTitle>
+                                <CardDescription>
+                                    Top performing V2G stations
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
