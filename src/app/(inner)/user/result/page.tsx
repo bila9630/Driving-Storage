@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -76,9 +76,9 @@ const TripDetails: React.FC<{ result: RouteResult }> = ({ result }) => {
     )
 }
 
-const ResultPage: React.FC = () => {
+// Separate the results display into its own component
+const ResultsDisplay: React.FC = () => {
     const searchParams = useSearchParams()
-    const router = useRouter()
     const [results, setResults] = useState<RouteResult[]>([])
     const [startTime, setStartTime] = useState<string>('')
     const [breaks, setBreaks] = useState<string>('')
@@ -181,13 +181,7 @@ const ResultPage: React.FC = () => {
     }, [searchParams])
 
     return (
-        <div className="container mx-auto mt-8">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">Result</h1>
-                <Button onClick={() => router.push('/user/search')}>
-                    <PlusCircle className="mr-2 h-4 w-4" />New Search
-                </Button>
-            </div>
+        <div>
             <div className="flex space-x-4 mb-4">
                 <Select onValueChange={setStartTime} value={startTime}>
                     <SelectTrigger className="w-[180px]">
@@ -260,6 +254,25 @@ const ResultPage: React.FC = () => {
                     </CardContent>
                 </Card>
             ))}
+        </div>
+    )
+}
+
+// Main page component
+const ResultPage: React.FC = () => {
+    const router = useRouter()
+
+    return (
+        <div className="container mx-auto mt-8">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">Result</h1>
+                <Button onClick={() => router.push('/user/search')}>
+                    <PlusCircle className="mr-2 h-4 w-4" />New Search
+                </Button>
+            </div>
+            <Suspense fallback={<div>Loading...</div>}>
+                <ResultsDisplay />
+            </Suspense>
         </div>
     )
 }
