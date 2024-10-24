@@ -26,7 +26,9 @@ import {
 const FormSchema = z.object({
   start: z.string().min(1, { message: "Start location is required." }),
   destination: z.string().min(1, { message: "Destination is required." }),
-  date: z.date().optional(),
+  date: z.date({
+    required_error: "Date is required.",
+  }),
   breaks: z.string().optional(),
   startTime: z.string().optional(),
 })
@@ -40,6 +42,7 @@ const SearchPage: React.FC = () => {
       destination: "",
       breaks: "",
       startTime: "",
+      date: undefined,
     },
   })
 
@@ -47,7 +50,7 @@ const SearchPage: React.FC = () => {
     const searchParams = new URLSearchParams({
       start: data.start,
       destination: data.destination,
-      date: data.date ? format(data.date, 'yyyy-MM-dd') : '',
+      date: format(data.date, 'yyyy-MM-dd'),
       breaks: data.breaks || '',
       startTime: data.startTime || '',
     })
@@ -119,6 +122,7 @@ const SearchPage: React.FC = () => {
                         />
                       </PopoverContent>
                     </Popover>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
