@@ -22,6 +22,7 @@ import { SustainabilityOverview } from "@/components/dashboard/sustainability-ov
 import { StatsCardsEnergy } from "@/components/dashboard/stats-cards-energy"
 import { StatsCardsSustain } from "@/components/dashboard/stats-cards-sustain"
 import { EnergyNews } from "@/components/dashboard/energy-news"
+import { LatestCharges } from "@/components/dashboard/latest-charges"
 
 
 export default function AdminOverviewPage() {
@@ -80,13 +81,13 @@ export default function AdminOverviewPage() {
                         </Card>
                         <Card className="col-span-3">
                             <CardHeader>
-                                <CardTitle>Green Impact Leaders</CardTitle>
+                                <CardTitle>Latest Charging Sessions</CardTitle>
                                 <CardDescription>
-                                    Top contributors to carbon reduction
+                                    Detailed sustainability metrics for recent charges
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <RecentSales />
+                                <LatestCharges />
                             </CardContent>
                         </Card>
                     </div>
