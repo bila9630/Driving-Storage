@@ -19,6 +19,9 @@ import { Button } from "@/components/ui/button";
 import { StatsCards } from '@/components/stats-cards';
 import { EnergyOverview } from "@/components/dashboard/energy-overview"
 import { SustainabilityOverview } from "@/components/dashboard/sustainability-overview"
+import { StatsCardsEnergy } from "@/components/dashboard/stats-cards-energy"
+import { StatsCardsSustain } from "@/components/dashboard/stats-cards-sustain"
+import { EnergyNews } from "@/components/dashboard/energy-news"
 
 
 export default function AdminOverviewPage() {
@@ -64,7 +67,7 @@ export default function AdminOverviewPage() {
 
                 {/* SUSTAINABILITY */}
                 <TabsContent value="sustainability" className="space-y-4">
-                    <StatsCards />
+                    <StatsCardsSustain />
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                         <Card className="col-span-4">
                             <CardHeader>
@@ -91,7 +94,7 @@ export default function AdminOverviewPage() {
 
                 {/* ENERGY */}
                 <TabsContent value="energy" className="space-y-4">
-                    <StatsCards />
+                    <StatsCardsEnergy />
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                         <Card className="col-span-4">
                             <CardHeader>
@@ -104,13 +107,13 @@ export default function AdminOverviewPage() {
                         </Card>
                         <Card className="col-span-3">
                             <CardHeader>
-                                <CardTitle>Peak Demand Response</CardTitle>
+                                <CardTitle>Energy Market News</CardTitle>
                                 <CardDescription>
-                                    Top performing V2G stations
+                                    Latest updates affecting energy prices
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <RecentSales />
+                                <EnergyNews />
                             </CardContent>
                         </Card>
                     </div>
