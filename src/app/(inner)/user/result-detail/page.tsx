@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -29,7 +29,7 @@ interface TripDetail {
     breakDuration?: string
 }
 
-const ResultDetailPage: React.FC = () => {
+const ResultDetailContent: React.FC = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
     const routeId = searchParams.get('routeId')
@@ -166,6 +166,14 @@ const ResultDetailPage: React.FC = () => {
                 </Button>
             </div>
         </div>
+    )
+}
+
+const ResultDetailPage: React.FC = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ResultDetailContent />
+        </Suspense>
     )
 }
 
