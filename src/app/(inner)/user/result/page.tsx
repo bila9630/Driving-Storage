@@ -79,6 +79,7 @@ const TripDetails: React.FC<{ result: RouteResult }> = ({ result }) => {
 // Separate the results display into its own component
 const ResultsDisplay: React.FC = () => {
     const searchParams = useSearchParams()
+    const router = useRouter() 
     const [results, setResults] = useState<RouteResult[]>([])
     const [startTime, setStartTime] = useState<string>('')
     const [breaks, setBreaks] = useState<string>('')
@@ -244,7 +245,8 @@ const ResultsDisplay: React.FC = () => {
                             </div>
                             <div className="flex items-center space-x-4">
                                 <span className="text-xl font-bold">€{result.price}</span>
-                                <Button variant="outline">
+                                <Button variant="outline"
+                                onClick={() => router.push(`/user/result-detail?routeId=${result.id}`)}>
                                     Continue
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
