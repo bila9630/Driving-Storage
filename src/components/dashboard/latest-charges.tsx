@@ -8,7 +8,7 @@ interface ChargingSession {
     duration: string
     consumption: string
     energySource: {
-        type: "Wind" | "Solar" | "Hydroelectric" | "Fossil Fuels"
+        type: "Sustainable" | "Non-sustainable"
         percentage: number
     }
     carbonSaved: string
@@ -24,10 +24,10 @@ const chargingSessions: ChargingSession[] = [
         duration: "2h 15min",
         consumption: "45.5 kWh",
         energySource: {
-            type: "Wind",
-            percentage: 85
+            type: "Non-sustainable",
+            percentage: 65
         },
-        carbonSaved: "32.4 kg",
+        carbonSaved: "0 kg",
         chargeType: "V2G",
         efficiency: 94
     },
@@ -38,7 +38,7 @@ const chargingSessions: ChargingSession[] = [
         duration: "1h 45min",
         consumption: "38.2 kWh",
         energySource: {
-            type: "Solar",
+            type: "Sustainable",
             percentage: 75
         },
         carbonSaved: "28.6 kg",
@@ -52,10 +52,10 @@ const chargingSessions: ChargingSession[] = [
         duration: "3h 00min",
         consumption: "62.8 kWh",
         energySource: {
-            type: "Hydroelectric",
-            percentage: 90
+            type: "Non-sustainable",
+            percentage: 55
         },
-        carbonSaved: "45.2 kg",
+        carbonSaved: "0 kg",
         chargeType: "V2G",
         efficiency: 96
     },
@@ -66,7 +66,7 @@ const chargingSessions: ChargingSession[] = [
         duration: "1h 30min",
         consumption: "32.4 kWh",
         energySource: {
-            type: "Wind",
+            type: "Sustainable",
             percentage: 95
         },
         carbonSaved: "24.8 kg",
@@ -80,10 +80,10 @@ const chargingSessions: ChargingSession[] = [
         duration: "2h 45min",
         consumption: "52.6 kWh",
         energySource: {
-            type: "Solar",
-            percentage: 80
+            type: "Non-sustainable",
+            percentage: 70
         },
-        carbonSaved: "38.4 kg",
+        carbonSaved: "0 kg",
         chargeType: "V2G",
         efficiency: 93
     }
@@ -91,10 +91,8 @@ const chargingSessions: ChargingSession[] = [
 
 const getEnergySourceColor = (type: string) => {
     switch (type) {
-        case "Wind": return "rgb(34 197 94)"
-        case "Solar": return "rgb(234 179 8)"
-        case "Hydroelectric": return "rgb(59 130 246)"
-        case "Fossil Fuels": return "rgb(239 68 68)"
+        case "Sustainable": return "rgb(34 197 94)"
+        case "Non-sustainable": return "rgb(239 68 68)"
         default: return "gray"
     }
 }
@@ -136,7 +134,9 @@ export function LatestCharges() {
                                 {session.energySource.type} ({session.energySource.percentage}%)
                             </div>
                             <div className="text-muted-foreground">Carbon Saved:</div>
-                            <div className="text-green-600">{session.carbonSaved}</div>
+                            <div className={session.energySource.type === "Sustainable" ? "text-green-600" : "text-red-600"}>
+                                {session.carbonSaved}
+                            </div>
                             <div className="text-muted-foreground">Efficiency:</div>
                             <div>{session.efficiency}%</div>
                         </div>
