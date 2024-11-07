@@ -18,8 +18,6 @@ interface RouteResult {
     duration: string
     breaks: number
     breakHours: number
-    price: number
-    earning: number
     saving: number
     tripDetails: TripDetail[]
 }
@@ -100,9 +98,7 @@ const ResultsDisplay: React.FC = () => {
                     duration: '6h30m',
                     breaks: 2,
                     breakHours: 95,
-                    price: 25,
-                    earning: 5,
-                    saving: 8,
+                    saving: 5,
                     tripDetails: [
                         { time: '8:00', city: searchParams.get('start') || '', duration: '2h15m' },
                         { time: '10:15', city: 'Break City', breakDuration: '40 mins break' },
@@ -120,9 +116,7 @@ const ResultsDisplay: React.FC = () => {
                     duration: '7h15m',
                     breaks: 3,
                     breakHours: 120,
-                    price: 32,
-                    earning: 8,
-                    saving: 12,
+                    saving: 7,
                     tripDetails: [
                         { time: '9:30', city: searchParams.get('start') || '', duration: '2h30m' },
                         { time: '12:00', city: 'Rest Stop A', breakDuration: '45 mins break' },
@@ -142,9 +136,7 @@ const ResultsDisplay: React.FC = () => {
                     duration: '5h15m',
                     breaks: 1,
                     breakHours: 45,
-                    price: 28,
-                    earning: 4,
-                    saving: 6,
+                    saving: 4,
                     tripDetails: [
                         { time: '11:00', city: searchParams.get('start') || '', duration: '3h' },
                         { time: '14:00', city: 'Charging Station X', breakDuration: '45 mins break' },
@@ -162,9 +154,7 @@ const ResultsDisplay: React.FC = () => {
                     duration: '6h30m',
                     breaks: 2,
                     breakHours: 90,
-                    price: 30,
-                    earning: 6,
-                    saving: 9,
+                    saving: 6,
                     tripDetails: [
                         { time: '13:00', city: searchParams.get('start') || '', duration: '2h45m' },
                         { time: '15:45', city: 'Service Area Y', breakDuration: '50 mins break' },
@@ -181,6 +171,25 @@ const ResultsDisplay: React.FC = () => {
         fetchResults()
     }, [searchParams])
 
+    // Filter results based on selected breaks and start time
+    const filteredResults = results.filter(result => {
+        const breakMatch = breaks === "all" || !breaks ? true : result.breaks === parseInt(breaks);
+        const timeMatch = startTime === "all" || !startTime ? true : result.startTime === startTime;
+        return breakMatch && timeMatch;
+    });
+
+    // Get unique start times and break counts from results
+    const uniqueStartTimes = Array.from(new Set(results.map(r => r.startTime)))
+        .sort((a, b) => {
+            // Convert times to minutes for proper comparison
+            const getMinutes = (time: string) => {
+                const [hours, minutes] = time.split(':').map(Number);
+                return hours * 60 + minutes;
+            };
+            return getMinutes(a) - getMinutes(b);
+        });
+    const uniqueBreakCounts = Array.from(new Set(results.map(r => r.breaks))).sort();
+
     return (
         <div>
             <div className="flex space-x-4 mb-4">
@@ -189,9 +198,10 @@ const ResultsDisplay: React.FC = () => {
                         <SelectValue placeholder="Start time" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="8:00">8:00</SelectItem>
-                        <SelectItem value="9:00">9:00</SelectItem>
-                        <SelectItem value="10:00">10:00</SelectItem>
+                        <SelectItem value="all">All times</SelectItem>
+                        {uniqueStartTimes.map(time => (
+                            <SelectItem key={time} value={time}>{time}</SelectItem>
+                        ))}
                     </SelectContent>
                 </Select>
                 <Select onValueChange={setBreaks} value={breaks}>
@@ -199,13 +209,16 @@ const ResultsDisplay: React.FC = () => {
                         <SelectValue placeholder="Number of breaks" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="0">0 breaks</SelectItem>
-                        <SelectItem value="1">1 break</SelectItem>
-                        <SelectItem value="2">2 breaks</SelectItem>
+                        <SelectItem value="all">All breaks</SelectItem>
+                        {uniqueBreakCounts.map(count => (
+                            <SelectItem key={count} value={count.toString()}>
+                                {count} {count === 1 ? 'break' : 'breaks'}
+                            </SelectItem>
+                        ))}
                     </SelectContent>
                 </Select>
             </div>
-            {results.map((result) => (
+            {filteredResults.map((result) => (
                 <Card
                     key={result.id}
                     className="mb-4 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_15px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
@@ -230,7 +243,7 @@ const ResultsDisplay: React.FC = () => {
                                     onClick={() => setExpandedResult(expandedResult === result.id ? null : result.id)}
                                     className="flex items-center space-x-1"
                                 >
-                                    <span>{result.breaks} break{result.breaks !== 1 ? 's' : ''}</span>
+                                    More Info
                                     {expandedResult === result.id ? (
                                         <ChevronUp className="w-4 h-4 ml-1" />
                                     ) : (
@@ -238,13 +251,11 @@ const ResultsDisplay: React.FC = () => {
                                     )}
                                 </Button>
                                 <div className="text-sm text-gray-500">
-                                    <span>Earning: {result.earning}€</span>
-                                    <span className="ml-4">Saving: {result.saving}€</span>
-                                    <span className="ml-4">Break min: {result.breakHours} min</span>
+                                    <span>Breaks: {result.breaks} | Break min: {result.breakHours} min</span>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <span className="text-xl font-bold">€{result.price}</span>
+                                <span className="text-xl font-bold"><span className="text-sm text-gray-500">saving:</span> {result.saving} €</span>
                                 <Button variant="outline"
                                 onClick={() => router.push(`/user/result-detail?routeId=${result.id}`)}>
                                     Continue

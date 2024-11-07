@@ -50,8 +50,6 @@ const ResultDetailContent: React.FC = () => {
                 breaks: 2,
                 breakHours: 95,
                 price: 25,
-                earning: 5,
-                saving: 8,
                 tripDetails: [
                     { time: '8:00', city: 'Berlin', duration: '2h15m' },
                     { time: '10:15', city: 'Break City', breakDuration: '40 mins break' },
@@ -142,18 +140,10 @@ const ResultDetailContent: React.FC = () => {
                     </div>
 
                     <div className="border-t mt-6 pt-6">
-                        <div className="grid grid-cols-3 gap-4 text-center">
+                        <div className="grid grid-cols-1 gap-4 text-center">
                             <div>
                                 <p className="text-gray-500 mb-1">Price</p>
                                 <p className="text-2xl font-bold">€{routeDetail.price}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-500 mb-1">Earning</p>
-                                <p className="text-2xl font-bold">€{routeDetail.earning}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-500 mb-1">Saving</p>
-                                <p className="text-2xl font-bold">€{routeDetail.saving}</p>
                             </div>
                         </div>
                     </div>
