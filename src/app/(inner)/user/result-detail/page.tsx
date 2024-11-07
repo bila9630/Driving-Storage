@@ -1,11 +1,10 @@
 'use client'
 
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, CarFront, Goal } from 'lucide-react'
-
 interface RouteResult {
     id: string
     start: string
@@ -21,20 +20,17 @@ interface RouteResult {
     saving: number
     tripDetails: TripDetail[]
 }
-
 interface TripDetail {
     time: string
     city: string
     duration?: string
     breakDuration?: string
 }
-
-const ResultDetailContent: React.FC = () => {
+const ResultDetailPage: React.FC = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
     const routeId = searchParams.get('routeId')
     const [routeDetail, setRouteDetail] = useState<RouteResult | null>(null)
-
     useEffect(() => {
         // TODO: Replace with actual API call
         const fetchRouteDetail = async () => {
@@ -50,6 +46,8 @@ const ResultDetailContent: React.FC = () => {
                 breaks: 2,
                 breakHours: 95,
                 price: 25,
+                earning: 5,
+                saving: 8,
                 tripDetails: [
                     { time: '8:00', city: 'Berlin', duration: '2h15m' },
                     { time: '10:15', city: 'Break City', breakDuration: '40 mins break' },
@@ -59,16 +57,13 @@ const ResultDetailContent: React.FC = () => {
             }
             setRouteDetail(mockResult)
         }
-
         if (routeId) {
             fetchRouteDetail()
         }
     }, [routeId])
-
     if (!routeDetail) {
         return <div>Loading...</div>
     }
-
     return (
         <div className="container mx-auto mt-8">
             <div className="flex items-center mb-6">
@@ -82,7 +77,6 @@ const ResultDetailContent: React.FC = () => {
                 </Button>
                 <h1 className="text-2xl font-bold">Trip Details</h1>
             </div>
-
             <Card className="mb-6">
                 <CardContent className="p-6">
                     <div className="grid grid-cols-3 gap-4 mb-6">
@@ -102,7 +96,6 @@ const ResultDetailContent: React.FC = () => {
                             <p className="text-gray-500">{routeDetail.destination}</p>
                         </div>
                     </div>
-
                     <div className="border-t pt-4">
                         <h3 className="font-semibold mb-4">Trip Timeline</h3>
                         <div className="space-y-8">
@@ -111,7 +104,6 @@ const ResultDetailContent: React.FC = () => {
                                     <div className="w-20 text-sm">
                                         {detail.time}
                                     </div>
-
                                     <div className="relative mx-4">
                                         <div className="absolute left-1/2 -translate-x-1/2">
                                             {index === 0 ? (
@@ -126,7 +118,6 @@ const ResultDetailContent: React.FC = () => {
                                             <div className="absolute top-6 left-1/2 w-[2px] h-[40px] bg-gray-300 -translate-x-1/2" />
                                         )}
                                     </div>
-
                                     <div className="flex-1">
                                         <span className="text-sm font-medium">{detail.city}</span>
                                         <div className="text-sm text-gray-500">
@@ -138,18 +129,24 @@ const ResultDetailContent: React.FC = () => {
                             ))}
                         </div>
                     </div>
-
                     <div className="border-t mt-6 pt-6">
-                        <div className="grid grid-cols-1 gap-4 text-center">
+                        <div className="grid grid-cols-3 gap-4 text-center">
                             <div>
                                 <p className="text-gray-500 mb-1">Price</p>
                                 <p className="text-2xl font-bold">€{routeDetail.price}</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-500 mb-1">Earning</p>
+                                <p className="text-2xl font-bold">€{routeDetail.earning}</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-500 mb-1">Saving</p>
+                                <p className="text-2xl font-bold">€{routeDetail.saving}</p>
                             </div>
                         </div>
                     </div>
                 </CardContent>
             </Card>
-
             <div className="flex justify-end">
                 <Button size="lg">
                     Proceed to Booking
@@ -158,13 +155,4 @@ const ResultDetailContent: React.FC = () => {
         </div>
     )
 }
-
-const ResultDetailPage: React.FC = () => {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <ResultDetailContent />
-        </Suspense>
-    )
-}
-
 export default ResultDetailPage
