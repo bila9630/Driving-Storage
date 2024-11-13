@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, CarFront, Goal } from 'lucide-react'
+import GoogleMap from '@/components/google-map' 
 interface RouteResult {
     id: string
     start: string
@@ -15,8 +16,6 @@ interface RouteResult {
     duration: string
     breaks: number
     breakHours: number
-    price: number
-    earning: number
     saving: number
     tripDetails: TripDetail[]
 }
@@ -29,40 +28,27 @@ interface TripDetail {
 const ResultDetailContent: React.FC = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const routeId = searchParams.get('routeId')
-    const [routeDetail, setRouteDetail] = useState<RouteResult | null>(null)
-    useEffect(() => {
-        // TODO: Replace with actual API call
-        const fetchRouteDetail = async () => {
-            // This is mock data - replace with actual API call
-            const mockResult: RouteResult = {
-                id: '1',
-                start: 'Berlin',
-                destination: 'Munich',
-                date: '2024-03-20',
-                startTime: '8:00',
-                endTime: '14:30',
-                duration: '6h30m',
-                breaks: 2,
-                breakHours: 95,
-                price: 25,
-                earning: 5,
-                saving: 8,
-                tripDetails: [
-                    { time: '8:00', city: 'Berlin', duration: '2h15m' },
-                    { time: '10:15', city: 'Break City', breakDuration: '40 mins break' },
-                    { time: '10:55', city: 'Break City', duration: '4h25m' },
-                    { time: '14:30', city: 'Munich' },
-                ]
-            }
-            setRouteDetail(mockResult)
-        }
-        if (routeId) {
-            fetchRouteDetail()
-        }
-    }, [routeId])
-    if (!routeDetail) {
-        return <div>Loading...</div>
+
+    // Get and parse all parameters from URL
+    const routeDetail: RouteResult = {
+        id: searchParams.get('id') || '',
+        start: searchParams.get('start') || '',
+        destination: searchParams.get('destination') || '',
+        date: searchParams.get('date') || '',
+        startTime: searchParams.get('startTime') || '',
+        endTime: searchParams.get('endTime') || '',
+        duration: searchParams.get('duration') || '',
+        breaks: Number(searchParams.get('breaks')) || 0,
+        breakHours: Number(searchParams.get('breakHours')) || 0,
+        saving: Number(searchParams.get('saving')) || 0,
+        // Parse the tripDetails from the URL
+        tripDetails: JSON.parse(searchParams.get('tripDetails') || '[]')
+    }
+
+    // Validate required data
+    if (!routeDetail.id || !routeDetail.start || !routeDetail.destination) {
+        router.push('/user/result')
+        return null
     }
     return (
         <div className="container mx-auto mt-8">
@@ -135,6 +121,12 @@ const ResultDetailContent: React.FC = () => {
                                 <p className="text-gray-500 mb-1">Saving</p>
                                 <p className="text-2xl font-bold">€{routeDetail.saving}</p>
                             </div>
+                        </div>
+                    </div>
+                    <div className="border-t mt-6 pt-6">
+                        <h3 className="font-semibold mb-4">Route Overview</h3>
+                        <div className="h-[400px] w-full rounded-lg overflow-hidden border shadow-sm">
+                            <GoogleMap />
                         </div>
                     </div>
                 </CardContent>
