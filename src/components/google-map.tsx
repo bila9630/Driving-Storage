@@ -4,10 +4,7 @@ import {
     APIProvider,
     Map,
     useMapsLibrary,
-    useMap,
-    AdvancedMarker,
-    Pin,
-    InfoWindow,
+    useMap
 } from "@vis.gl/react-google-maps";
 
 const darkMapStyle = [
@@ -206,11 +203,11 @@ const GoogleMap = () => {
         <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}>
             <div style={{ height: "100vh", width: "100%" }}>
                 <Map
-                    mapId={process.env.NEXT_PUBLIC_MAP_ID}
                     fullscreenControl={false}
-                // options={{
-                //     styles: darkMapStyle,
-                // }}
+                    // @ts-expect-error default example
+                    options={{
+                        styles: darkMapStyle,
+                    }}
                 >
                     <Directions />
                 </Map>
@@ -225,6 +222,10 @@ function Directions() {
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
     const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
     const [routes, setRoutes] = useState<google.maps.DirectionsRoute[]>([]);
+
+    const [routeIndex, setRouteIndex] = useState(0);
+    const selected = routes[routeIndex];
+    const leg = selected?.legs[0];
 
     useEffect(() => {
         if (!routesLibrary || !map) return;
@@ -249,9 +250,35 @@ function Directions() {
 
     }, [directionsService, directionsRenderer])
 
-    console.log("test", routes);
+    useEffect(() => {
+        if (!directionsRenderer) return;
+        directionsRenderer.setRouteIndex(routeIndex);
+    }, [routeIndex, directionsRenderer]);
 
-    return null;
+
+    if (!leg) return null;
+
+    return (
+        <div className="direction">
+            <h2>{selected?.summary}</h2>
+            <p>
+                {leg.start_address.split(",")[0]} to {leg.end_address.split(",")[0]}
+            </p>
+            <p>Distance: {leg.distance?.text}</p>
+            <p>Duration: {leg.duration?.text}</p>
+
+            <h2>Other Routes</h2>
+            <ul>
+                {routes.map((route, index) => (
+                    <li key={route.summary}>
+                        <button onClick={() => setRouteIndex(index)}>
+                            {route.summary}
+                        </button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 }
 
 export default GoogleMap;
