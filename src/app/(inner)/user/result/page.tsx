@@ -257,7 +257,22 @@ const ResultsDisplay: React.FC = () => {
                             <div className="flex items-center space-x-4">
                                 <span className="text-xl font-bold"><span className="text-sm text-gray-500">saving:</span> {result.saving} €</span>
                                 <Button variant="outline"
-                                onClick={() => router.push(`/user/result-detail?routeId=${result.id}`)}>
+                                onClick={() => {
+                                    const routeParams = new URLSearchParams({
+                                        id: result.id,
+                                        start: result.start,
+                                        destination: result.destination,
+                                        date: result.date,
+                                        startTime: result.startTime,
+                                        endTime: result.endTime,
+                                        duration: result.duration,
+                                        breaks: result.breaks.toString(),
+                                        breakHours: result.breakHours.toString(),
+                                        saving: result.saving.toString(),
+                                        tripDetails: JSON.stringify(result.tripDetails)
+                                    })
+                                    router.push(`/user/result-detail?${routeParams.toString()}`)
+                                }}>
                                     Continue
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
