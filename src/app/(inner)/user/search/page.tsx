@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 import { format } from "date-fns"
 import { CalendarIcon, ClockIcon } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -14,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRouter } from 'next/navigation'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { z } from "zod" 
 import {
   Form,
   FormControl,
@@ -33,18 +34,65 @@ const FormSchema = z.object({
   startTime: z.string().optional(),
 })
 
+interface PlaceAutocompleteProps {
+  onPlaceSelect: (place: google.maps.places.PlaceResult | null) => void;
+  placeholder: string;
+}
+
+const PlaceAutocomplete = ({ onPlaceSelect, placeholder }: PlaceAutocompleteProps) => {
+  const [placeAutocomplete, setPlaceAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const places = useMapsLibrary('places');
+
+  useEffect(() => {
+      if (!places || !inputRef.current) return;
+
+      const options = {
+          fields: ['geometry', 'name', 'formatted_address']
+      };
+
+      setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options));
+  }, [places]);
+
+  useEffect(() => {
+      if (!placeAutocomplete) return;
+
+      placeAutocomplete.addListener('place_changed', () => {
+          onPlaceSelect(placeAutocomplete.getPlace());
+      });
+  }, [onPlaceSelect, placeAutocomplete]);
+
+  return (
+      <input
+          ref={inputRef}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          placeholder={placeholder}
+          type="text"
+      />
+  );
+};
+
 const SearchPage: React.FC = () => {
   const router = useRouter()
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      start: "",
-      destination: "",
-      breaks: "",
-      startTime: "",
-      date: undefined,
-    },
+      resolver: zodResolver(FormSchema),
   })
+
+  const [startPlace, setStartPlace] = useState<google.maps.places.PlaceResult | null>(null);
+  const [destinationPlace, setDestinationPlace] = useState<google.maps.places.PlaceResult | null>(null);
+
+  // Update form values when places are selected
+  useEffect(() => {
+      if (startPlace?.formatted_address) {
+          form.setValue('start', startPlace.formatted_address);
+      }
+  }, [startPlace, form]);
+
+  useEffect(() => {
+      if (destinationPlace?.formatted_address) {
+          form.setValue('destination', destinationPlace.formatted_address);
+      }
+  }, [destinationPlace, form]);
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const searchParams = new URLSearchParams({
@@ -58,140 +106,163 @@ const SearchPage: React.FC = () => {
   }
 
   return (
-    <Card className="w-full max-w-3xl mx-auto mt-8">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">Search for the best route</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="flex space-x-4">
-              <FormField
-                control={form.control}
-                name="start"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input placeholder="Start" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="destination"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input placeholder="Destination" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="px-8">Search</Button>
-            </div>
-            <div className="flex space-x-4">
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-[240px] justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="startTime"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            <ClockIcon className="mr-2 h-4 w-4" />
-                            {field.value ? field.value : <span>Pick a start time</span>}
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48 p-0" align="start">
-                        <ScrollArea className="h-72">
-                          <div className="grid grid-cols-1 gap-2 p-4">
-                            {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
-                              <Button
-                                key={hour}
-                                onClick={() => field.onChange(`${hour.toString().padStart(2, '0')}:00`)}
-                                variant="ghost"
-                                className="justify-start"
-                              >
-                                {`${hour.toString().padStart(2, '0')}:00`}
-                              </Button>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </PopoverContent>
-                    </Popover>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="breaks"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Number of breaks" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {[0, 1, 2, 3, 4, 5].map((num) => (
-                          <SelectItem key={num} value={num.toString()}>{num} break{num !== 1 ? 's' : ''}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
-  )
+    <APIProvider
+        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
+        solutionChannel='GMP_devsite_samples_v3_rgmautocomplete'
+    >
+        <Card className="w-full max-w-3xl mx-auto mt-8">
+            <CardHeader>
+                <CardTitle className="text-2xl font-bold text-center">Search for the best route</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <div className="flex space-x-4">
+                            <FormField
+                                control={form.control}
+                                name="start"
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormControl>
+                                            <PlaceAutocomplete
+                                                onPlaceSelect={(place) => {
+                                                    if (place?.formatted_address) {
+                                                        field.onChange(place.formatted_address);
+                                                    }
+                                                }}
+                                                placeholder="Start"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="destination"
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormControl>
+                                            <PlaceAutocomplete
+                                                onPlaceSelect={(place) => {
+                                                    if (place?.formatted_address) {
+                                                        field.onChange(place.formatted_address);
+                                                    }
+                                                }}
+                                                placeholder="Destination"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button type="submit" className="px-8">Search</Button>
+                        </div>
+                        <div className="flex space-x-4">
+                            <FormField
+                                control={form.control}
+                                name="date"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-[240px] justify-start text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="startTime"
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full justify-start text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        <ClockIcon className="mr-2 h-4 w-4" />
+                                                        {field.value ? field.value : <span>Pick a start time</span>}
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-48 p-0" align="start">
+                                                <ScrollArea className="h-72">
+                                                    <div className="grid grid-cols-1 gap-2 p-4">
+                                                        {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                                                            <Button
+                                                                key={hour}
+                                                                onClick={() => field.onChange(`${hour.toString().padStart(2, '0')}:00`)}
+                                                                variant="ghost"
+                                                                className="justify-start"
+                                                            >
+                                                                {`${hour.toString().padStart(2, '0')}:00`}
+                                                            </Button>
+                                                        ))}
+                                                    </div>
+                                                </ScrollArea>
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="breaks"
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Number of breaks" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {[0, 1, 2, 3, 4, 5].map((num) => (
+                                                    <SelectItem key={num} value={num.toString()}>
+                                                        {num} break{num !== 1 ? 's' : ''}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
+    </APIProvider>
+)
 }
 
 export default SearchPage
