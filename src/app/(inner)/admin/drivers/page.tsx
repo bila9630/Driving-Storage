@@ -18,7 +18,7 @@ interface Driver {
     name: string
     role: string
     avatar: string
-    status: 'Driving' | 'On Break' | 'Off Duty'
+    status: 'Driving' | 'On Break/V2G' | 'Off Duty'
     location: string
     workingHours: string
     phoneNumber: string
@@ -51,7 +51,7 @@ export default function DriversPage() {
                     name: 'Jane Smith', 
                     role: 'Junior Driver',
                     avatar: '/avatars/02.png',
-                    status: 'On Break', 
+                    status: 'On Break/V2G', 
                     location: 'Berlin',
                     workingHours: '35 hours',
                     phoneNumber: '+491765432198',
@@ -87,7 +87,7 @@ export default function DriversPage() {
                     name: 'Alex Lee', 
                     role: 'Senior Driver',
                     avatar: '/avatars/05.png',
-                    status: 'On Break', 
+                    status: 'On Break/V2G', 
                     location: 'Cologne',
                     workingHours: '37 hours',
                     phoneNumber: '+491357924680',
@@ -105,7 +105,7 @@ export default function DriversPage() {
         switch (status) {
             case 'Driving':
                 return <Car className="h-4 w-4 mr-1" />
-            case 'On Break':
+            case 'On Break/V2G':
                 return <Coffee className="h-4 w-4 mr-1" />
             case 'Off Duty':
                 return <Power className="h-4 w-4 mr-1" />
