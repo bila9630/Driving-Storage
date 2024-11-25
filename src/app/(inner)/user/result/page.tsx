@@ -267,8 +267,18 @@ const ResultsDisplay: React.FC = () => {
                                             <ChevronDown className="w-4 h-4 ml-1" />
                                         )}
                                     </Button>
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-sm text-gray-500 flex items-center space-x-2">
                                         <span>Breaks: {result.breaks} | Break min: {result.breakHours} min</span>
+                                        {isMostSavings && (
+                                            <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                                                Most savings
+                                            </span>
+                                        )}
+                                        {isShortestDuration && (
+                                            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                                                Shortest duration
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-4">

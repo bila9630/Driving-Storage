@@ -211,19 +211,25 @@ const SearchPage: React.FC = () => {
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
+                                            {/* TIME PICKER OPTIONS */}
                                             <PopoverContent className="w-48 p-0" align="start">
                                                 <ScrollArea className="h-72">
                                                     <div className="grid grid-cols-1 gap-2 p-4">
-                                                        {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
-                                                            <Button
-                                                                key={hour}
-                                                                onClick={() => field.onChange(`${hour.toString().padStart(2, '0')}:00`)}
-                                                                variant="ghost"
-                                                                className="justify-start"
-                                                            >
-                                                                {`${hour.toString().padStart(2, '0')}:00`}
-                                                            </Button>
-                                                        ))}
+                                                        {Array.from({ length: 48 }, (_, i) => {
+                                                            const hour = Math.floor(i / 2);
+                                                            const minute = i % 2 === 0 ? "00" : "30";
+                                                            const timeString = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                                            return (
+                                                                <Button
+                                                                    key={timeString}
+                                                                    onClick={() => field.onChange(timeString)}
+                                                                    variant="ghost"
+                                                                    className="justify-start"
+                                                                >
+                                                                    {timeString}
+                                                                </Button>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </ScrollArea>
                                             </PopoverContent>
