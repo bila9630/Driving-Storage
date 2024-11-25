@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils"
 interface Car {
     id: string
     model: string
-    status: 'In Use' | 'Charging' | 'Idle'
+    status: 'In Use' | 'Charging' | 'V2G'
     licensePlate: string
     batteryCapacity: string
     batteryHealth: 'Great' | 'Good'
@@ -32,13 +32,13 @@ export default function CarsPage() {
         const fetchCars = async () => {
             // Replace this with actual API call
             const mockCars: Car[] = [
-                { id: '15482', model: 'Ford-150', status: 'In Use', licensePlate: 'ABC123', batteryCapacity: '480 kWh', batteryHealth: 'Great', speed: '160 km/h' },
-                { id: '12484', model: 'Fiat 500', status: 'Charging', licensePlate: 'XYZ789', batteryCapacity: '350 kWh', batteryHealth: 'Good', speed: '180 km/h' },
-                { id: '18965', model: 'Tesla Model 3', status: 'Idle', licensePlate: 'DEF456', batteryCapacity: '520 kWh', batteryHealth: 'Great', speed: '200 km/h' },
-                { id: '23571', model: 'Chevrolet Bolt', status: 'Charging', licensePlate: 'GHI789', batteryCapacity: '400 kWh', batteryHealth: 'Good', speed: '170 km/h' },
-                { id: '31426', model: 'Nissan Leaf', status: 'In Use', licensePlate: 'JKL012', batteryCapacity: '380 kWh', batteryHealth: 'Good', speed: '150 km/h' },
-                { id: '45698', model: 'BMW i3', status: 'Idle', licensePlate: 'MNO345', batteryCapacity: '420 kWh', batteryHealth: 'Great', speed: '190 km/h' },
-                { id: '78932', model: 'Hyundai Kona', status: 'In Use', licensePlate: 'PQR678', batteryCapacity: '450 kWh', batteryHealth: 'Good', speed: '175 km/h' },
+                { id: '15482', model: 'Mercedes-Benz eActros', status: 'In Use', licensePlate: 'ABC123', batteryCapacity: '480 kWh', batteryHealth: 'Great', speed: '160 km/h' },
+                { id: '12484', model: 'Volvo FE Electric', status: 'Charging', licensePlate: 'XYZ789', batteryCapacity: '350 kWh', batteryHealth: 'Good', speed: '180 km/h' },
+                { id: '18965', model: 'DAF CF Electric', status: 'V2G', licensePlate: 'DEF456', batteryCapacity: '520 kWh', batteryHealth: 'Great', speed: '200 km/h' },
+                { id: '23571', model: 'Renault Trucks E-Tech D', status: 'Charging', licensePlate: 'GHI789', batteryCapacity: '400 kWh', batteryHealth: 'Good', speed: '170 km/h' },
+                { id: '31426', model: 'MAN eTGM', status: 'In Use', licensePlate: 'JKL012', batteryCapacity: '380 kWh', batteryHealth: 'Good', speed: '150 km/h' },
+                { id: '45698', model: 'Volvo FL Electric', status: 'V2G', licensePlate: 'MNO345', batteryCapacity: '420 kWh', batteryHealth: 'Great', speed: '190 km/h' },
+                { id: '78932', model: 'FUSO eCanter', status: 'In Use', licensePlate: 'PQR678', batteryCapacity: '450 kWh', batteryHealth: 'Good', speed: '175 km/h' },
             ]
             setCars(mockCars)
         }
@@ -52,7 +52,7 @@ export default function CarsPage() {
                 return <Car className="h-4 w-4 mr-1" />
             case 'Charging':
                 return <Battery className="h-4 w-4 mr-1" />
-            case 'Idle':
+            case 'V2G':
                 return <Pause className="h-4 w-4 mr-1" />
         }
     }
@@ -63,7 +63,7 @@ export default function CarsPage() {
                 return 'border-green-500 text-green-500'
             case 'Charging':
                 return 'border-yellow-500 text-yellow-500'
-            case 'Idle':
+            case 'V2G':
                 return 'border-blue-500 text-blue-500'
         }
     }

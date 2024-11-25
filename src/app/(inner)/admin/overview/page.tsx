@@ -38,7 +38,7 @@ export default function AdminOverviewPage() {
             <Tabs defaultValue="finance" className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="finance">Finance</TabsTrigger>
-                    <TabsTrigger value="sustainability">Sustainability</TabsTrigger>
+                    {/*<TabsTrigger value="sustainability">Sustainability</TabsTrigger>*/}
                     <TabsTrigger value="energy">Energy</TabsTrigger>
                 </TabsList>
                 <TabsContent value="finance" className="space-y-4">

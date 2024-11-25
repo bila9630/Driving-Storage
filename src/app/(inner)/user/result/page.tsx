@@ -190,6 +190,17 @@ const ResultsDisplay: React.FC = () => {
         });
     const uniqueBreakCounts = Array.from(new Set(results.map(r => r.breaks))).sort();
 
+    const parseDuration = (duration: string): number => {
+        const [hours, minutes] = duration.split('h').map(part => parseInt(part.replace('m', ''), 10) || 0)
+        return hours * 60 + minutes
+    }
+
+    // Identify trips with the most savings and shortest duration
+    const tripWithMostSavings = results.reduce((prev, current) => (current.saving > prev.saving ? current : prev), results[0])
+    const tripWithShortestDuration = results.reduce((prev, current) =>
+        parseDuration(current.duration) < parseDuration(prev.duration) ? current : prev, results[0]
+    )
+    
     return (
         <div>
             <div className="flex space-x-4 mb-4">
@@ -218,72 +229,79 @@ const ResultsDisplay: React.FC = () => {
                     </SelectContent>
                 </Select>
             </div>
-            {filteredResults.map((result) => (
-                <Card
-                    key={result.id}
-                    className="mb-4 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_15px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-                >
-                    <CardContent className="p-4">
-                        <div className="flex justify-between items-center mb-2">
-                            <div className="flex flex-col items-start">
-                                <span className="text-xl font-semibold">{result.startTime}</span>
-                                <span className="text-sm">{result.start}</span>
-                            </div>
-                            <span className="text-sm text-gray-500">{result.duration}</span>
-                            <div className="flex flex-col items-end">
-                                <span className="text-xl font-semibold">{result.endTime}</span>
-                                <span className="text-sm">{result.destination}</span>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-center mt-4">
-                            <div className="flex items-center space-x-4">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setExpandedResult(expandedResult === result.id ? null : result.id)}
-                                    className="flex items-center space-x-1"
-                                >
-                                    More Info
-                                    {expandedResult === result.id ? (
-                                        <ChevronUp className="w-4 h-4 ml-1" />
-                                    ) : (
-                                        <ChevronDown className="w-4 h-4 ml-1" />
-                                    )}
-                                </Button>
-                                <div className="text-sm text-gray-500">
-                                    <span>Breaks: {result.breaks} | Break min: {result.breakHours} min</span>
+            {filteredResults.map((result) => {
+                const isMostSavings = result.id === tripWithMostSavings?.id;
+                const isShortestDuration = result.id === tripWithShortestDuration?.id;
+
+                return (
+                    <Card
+                        key={result.id}
+                        className={`mb-4 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_15px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] ${
+                            isMostSavings ? 'border-2 border-green-500' : ''
+                        } ${isShortestDuration ? 'border-2 border-blue-500' : ''}`}
+                    >
+                        <CardContent className="p-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <div className="flex flex-col items-start">
+                                    <span className="text-xl font-semibold">{result.startTime}</span>
+                                    <span className="text-sm">{result.start}</span>
+                                </div>
+                                <span className="text-sm text-gray-500">{result.duration}</span>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-xl font-semibold">{result.endTime}</span>
+                                    <span className="text-sm">{result.destination}</span>
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-4">
-                                <span className="text-xl font-bold"><span className="text-sm text-gray-500">saving:</span> {result.saving} €</span>
-                                <Button variant="outline"
-                                onClick={() => {
-                                    const routeParams = new URLSearchParams({
-                                        id: result.id,
-                                        start: result.start,
-                                        destination: result.destination,
-                                        date: result.date,
-                                        startTime: result.startTime,
-                                        endTime: result.endTime,
-                                        duration: result.duration,
-                                        breaks: result.breaks.toString(),
-                                        breakHours: result.breakHours.toString(),
-                                        saving: result.saving.toString(),
-                                        tripDetails: JSON.stringify(result.tripDetails)
-                                    })
-                                    router.push(`/user/result-detail?${routeParams.toString()}`)
-                                }}>
-                                    Continue
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
+                            <div className="flex justify-between items-center mt-4">
+                                <div className="flex items-center space-x-4">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setExpandedResult(expandedResult === result.id ? null : result.id)}
+                                        className="flex items-center space-x-1"
+                                    >
+                                        More Info
+                                        {expandedResult === result.id ? (
+                                            <ChevronUp className="w-4 h-4 ml-1" />
+                                        ) : (
+                                            <ChevronDown className="w-4 h-4 ml-1" />
+                                        )}
+                                    </Button>
+                                    <div className="text-sm text-gray-500">
+                                        <span>Breaks: {result.breaks} | Break min: {result.breakHours} min</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <span className="text-xl font-bold"><span className="text-sm text-gray-500">saving:</span> {result.saving} €</span>
+                                    <Button variant="outline"
+                                        onClick={() => {
+                                            const routeParams = new URLSearchParams({
+                                                id: result.id,
+                                                start: result.start,
+                                                destination: result.destination,
+                                                date: result.date,
+                                                startTime: result.startTime,
+                                                endTime: result.endTime,
+                                                duration: result.duration,
+                                                breaks: result.breaks.toString(),
+                                                breakHours: result.breakHours.toString(),
+                                                saving: result.saving.toString(),
+                                                tripDetails: JSON.stringify(result.tripDetails)
+                                            });
+                                            router.push(`/user/result-detail?${routeParams.toString()}`);
+                                        }}>
+                                        Continue
+                                        <ArrowRight className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                        {expandedResult === result.id && <TripDetails result={result} />}
-                    </CardContent>
-                </Card>
-            ))}
+                            {expandedResult === result.id && <TripDetails result={result} />}
+                        </CardContent>
+                    </Card>
+                );
+            })}
         </div>
-    )
+    );
 }
 
 // Main page component

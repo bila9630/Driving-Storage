@@ -83,6 +83,40 @@ const ResultDetailContent: React.FC = () => {
                         </div>
                     </div>
                     <div className="border-t pt-4">
+    <h3 className="font-semibold mb-4">Trip Timeline</h3>
+    <div className="flex space-x-8 overflow-x-auto pb-4">
+        {routeDetail.tripDetails.map((detail, index) => (
+            <div key={index} className="flex flex-col items-center min-w-[150px]">
+                <div className="text-sm mb-2">
+                    {detail.time}
+                </div>
+                <div className="relative">
+                    <div className="flex items-center">
+                        {index === 0 ? (
+                            <CarFront className="w-5 h-5" />
+                        ) : index === routeDetail.tripDetails.length - 1 ? (
+                            <Goal className="w-5 h-5" />
+                        ) : (
+                            <div className="w-3 h-3 rounded-full border-2 border-gray-300 bg-white" />
+                        )}
+                    </div>
+                    {index < routeDetail.tripDetails.length - 1 && (
+                        <div className="absolute top-1/2 left-1/2 h-[2px] w-[calc(100% + 40px)] bg-gray-300 -translate-x-1/2" />
+                    )}
+                </div>
+                <div className="mt-2 text-center">
+                    <span className="text-sm font-medium block">{detail.city}</span>
+                    <div className="text-sm text-gray-500">
+                        {detail.duration && <div>{detail.duration}</div>}
+                        {detail.breakDuration && <div>{detail.breakDuration}</div>}
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
+                    {/* OG timeline
+                    <div className="border-t pt-4">
                         <h3 className="font-semibold mb-4">Trip Timeline</h3>
                         <div className="space-y-8">
                             {routeDetail.tripDetails.map((detail, index) => (
@@ -115,6 +149,7 @@ const ResultDetailContent: React.FC = () => {
                             ))}
                         </div>
                     </div>
+                    */}
                     <div className="border-t mt-6 pt-6">
                         <div className="grid grid-cols-1 gap-4 text-center">
                             <div>

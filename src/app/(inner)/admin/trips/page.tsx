@@ -15,7 +15,6 @@ import { PlusCircle, Pencil, Trash2 } from 'lucide-react'
 interface Trip {
   id: number
   driverName: string
-  carModel: string
   startLocation: string
   endLocation: string
   startDate: string
@@ -30,9 +29,9 @@ export default function TripsPage() {
     const fetchTrips = async () => {
       // Replace this with actual API call
       const mockTrips: Trip[] = [
-        { id: 1, driverName: 'John Doe', carModel: 'Toyota Camry', startLocation: 'New York', endLocation: 'Boston', startDate: '2023-05-01', status: 'Completed' },
-        { id: 2, driverName: 'Jane Smith', carModel: 'Honda Civic', startLocation: 'Los Angeles', endLocation: 'San Francisco', startDate: '2023-05-15', status: 'In Progress' },
-        { id: 3, driverName: 'Mike Johnson', carModel: 'Ford F-150', startLocation: 'Chicago', endLocation: 'Detroit', startDate: '2023-05-30', status: 'Scheduled' },
+        { id: 1, driverName: 'John Doe', startLocation: 'Berlin', endLocation: 'Hamburg', startDate: '2023-05-01', status: 'Completed' },
+        { id: 2, driverName: 'Jane Smith', startLocation: 'Munich', endLocation: 'Frankfurt', startDate: '2023-05-15', status: 'In Progress' },
+        { id: 3, driverName: 'Mike Johnson', startLocation: 'Cologne', endLocation: 'Stuttgart', startDate: '2023-05-30', status: 'Scheduled' },
       ]
       setTrips(mockTrips)
     }
@@ -50,7 +49,6 @@ export default function TripsPage() {
         <TableHeader>
           <TableRow>
             <TableHead>Driver</TableHead>
-            <TableHead>Car</TableHead>
             <TableHead>Start Location</TableHead>
             <TableHead>End Location</TableHead>
             <TableHead>Start Date</TableHead>
@@ -62,7 +60,6 @@ export default function TripsPage() {
           {trips.map((trip) => (
             <TableRow key={trip.id}>
               <TableCell>{trip.driverName}</TableCell>
-              <TableCell>{trip.carModel}</TableCell>
               <TableCell>{trip.startLocation}</TableCell>
               <TableCell>{trip.endLocation}</TableCell>
               <TableCell>{trip.startDate}</TableCell>
