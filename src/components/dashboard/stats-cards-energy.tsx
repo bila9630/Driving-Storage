@@ -8,7 +8,7 @@ import {
 
 export function StatsCardsEnergy() {
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
@@ -62,7 +62,7 @@ export function StatsCardsEnergy() {
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                        Active Charging Sessions
+                        Charging Sessions
                     </CardTitle>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -82,31 +82,6 @@ export function StatsCardsEnergy() {
                     <div className="text-2xl font-bold">342</div>
                     <p className="text-xs text-muted-foreground">
                         +18.2% from average
-                    </p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                        Grid Frequency
-                    </CardTitle>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        className="h-4 w-4 text-muted-foreground"
-                    >
-                        <path d="M2 12h20M2 12l10-10M2 12l10 10" />
-                    </svg>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">50.02 Hz</div>
-                    <p className="text-xs text-muted-foreground">
-                        Within normal range
                     </p>
                 </CardContent>
             </Card>

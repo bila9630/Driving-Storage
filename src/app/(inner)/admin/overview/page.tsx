@@ -18,11 +18,8 @@ import { RecentSales } from "@/components/dashboard/recent-sales";
 import { Button } from "@/components/ui/button";
 import { StatsCards } from '@/components/stats-cards';
 import { EnergyOverview } from "@/components/dashboard/energy-overview"
-import { SustainabilityOverview } from "@/components/dashboard/sustainability-overview"
 import { StatsCardsEnergy } from "@/components/dashboard/stats-cards-energy"
-import { StatsCardsSustain } from "@/components/dashboard/stats-cards-sustain"
 import { EnergyNews } from "@/components/dashboard/energy-news"
-import { LatestCharges } from "@/components/dashboard/latest-charges"
 
 
 export default function AdminOverviewPage() {
@@ -38,7 +35,6 @@ export default function AdminOverviewPage() {
             <Tabs defaultValue="finance" className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="finance">Finance</TabsTrigger>
-                    {/*<TabsTrigger value="sustainability">Sustainability</TabsTrigger>*/}
                     <TabsTrigger value="energy">Energy</TabsTrigger>
                 </TabsList>
                 <TabsContent value="finance" className="space-y-4">
@@ -61,33 +57,6 @@ export default function AdminOverviewPage() {
                             </CardHeader>
                             <CardContent>
                                 <RecentSales />
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
-
-                {/* SUSTAINABILITY */}
-                <TabsContent value="sustainability" className="space-y-4">
-                    <StatsCardsSustain />
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                        <Card className="col-span-4">
-                            <CardHeader>
-                                <CardTitle>Energy Sources Distribution</CardTitle>
-                                <CardDescription>Fleet energy consumption by source</CardDescription>
-                            </CardHeader>
-                            <CardContent className="pl-2">
-                                <SustainabilityOverview />
-                            </CardContent>
-                        </Card>
-                        <Card className="col-span-3">
-                            <CardHeader>
-                                <CardTitle>Latest Charging Sessions</CardTitle>
-                                <CardDescription>
-                                    Detailed sustainability metrics for recent charges
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <LatestCharges />
                             </CardContent>
                         </Card>
                     </div>
