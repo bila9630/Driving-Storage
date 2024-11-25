@@ -135,11 +135,10 @@ const ResultDetailContent: React.FC = () => {
                     <div className="border-t mt-6 pt-6">
                         <h3 className="font-semibold mb-4">Route Overview</h3>
                         <div className="h-[670px] w-full rounded-lg overflow-hidden border shadow-sm">
-                            {/*<GoogleMap 
-                                {/*origin={routeDetail.start}
+                            <GoogleMap 
+                                origin={routeDetail.start}
                                 destination={routeDetail.destination}
-                                showRoute={true} /> --- for the time when passing stuff to the component*/}
-                            <GoogleMap />
+                            />
                         </div>
                     </div>
                 </CardContent>

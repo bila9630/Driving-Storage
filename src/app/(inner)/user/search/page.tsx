@@ -79,6 +79,10 @@ const SearchPage: React.FC = () => {
 
   const [startPlace, setStartPlace] = useState<google.maps.places.PlaceResult | null>(null);
   const [destinationPlace, setDestinationPlace] = useState<google.maps.places.PlaceResult | null>(null);
+  const [routeInfo, setRouteInfo] = useState<{
+    distance?: string;
+    duration?: string;
+  }>({});
 
   // Update form values when places are selected
   useEffect(() => {
@@ -93,6 +97,32 @@ const SearchPage: React.FC = () => {
       }
   }, [destinationPlace, form]);
 
+  // Add this function to calculate route
+  const calculateRoute = async (start: string, destination: string) => {
+    const maps = google.maps;
+    if (!maps) return;
+
+    const directionsService = new maps.DirectionsService();
+    
+    try {
+      const result = await directionsService.route({
+        origin: start,
+        destination: destination,
+        travelMode: google.maps.TravelMode.DRIVING,
+      });
+
+      if (result.routes[0]?.legs[0]) {
+        setRouteInfo({
+          distance: result.routes[0].legs[0].distance?.text,
+          duration: result.routes[0].legs[0].duration?.text,
+        });
+      }
+    } catch (error) {
+      console.error('Error calculating route:', error);
+    }
+  };
+
+  // Modify the onSubmit function
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const searchParams = new URLSearchParams({
       start: data.start,
@@ -100,9 +130,21 @@ const SearchPage: React.FC = () => {
       date: format(data.date, 'yyyy-MM-dd'),
       breaks: data.breaks || '',
       startTime: data.startTime || '',
+      distance: routeInfo.distance || '',
+      duration: routeInfo.duration || '',
     })
     router.push(`/user/result?${searchParams.toString()}`)
   }
+
+  // Add effect to calculate route when both places are selected
+  useEffect(() => {
+    if (startPlace?.formatted_address && destinationPlace?.formatted_address) {
+      calculateRoute(
+        startPlace.formatted_address,
+        destinationPlace.formatted_address
+      );
+    }
+  }, [startPlace, destinationPlace]);
 
   return (
     <APIProvider

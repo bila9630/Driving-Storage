@@ -37,5 +37,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Notes
 - UserNav component is unused and can be removed
+- user/auto and user/test are test pages
 
 comment to trigger vercel deploy

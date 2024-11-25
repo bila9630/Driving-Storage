@@ -16,6 +16,7 @@ interface RouteResult {
     startTime: string
     endTime: string
     duration: string
+    distance: string
     breaks: number
     breakHours: number
     saving: number
@@ -86,7 +87,9 @@ const ResultsDisplay: React.FC = () => {
     useEffect(() => {
         // Fetch results based on search params
         const fetchResults = async () => {
-            // TODO: Replace with actual API call
+            const actualDuration = searchParams.get('duration') || '';
+            const actualDistance = searchParams.get('distance') || '';
+            
             const mockResults: RouteResult[] = [
                 {
                     id: '1',
@@ -95,12 +98,13 @@ const ResultsDisplay: React.FC = () => {
                     date: searchParams.get('date') || '',
                     startTime: '8:00',
                     endTime: '14:30',
-                    duration: '6h30m',
+                    duration: actualDuration || '6h30m',
+                    distance: actualDistance || '450 km',
                     breaks: 2,
                     breakHours: 95,
                     saving: 5,
                     tripDetails: [
-                        { time: '8:00', city: searchParams.get('start') || '', duration: '2h15m' },
+                        { time: '8:00', city: searchParams.get('start') || '', duration: actualDuration || '2h15m' },
                         { time: '10:15', city: 'Break City', breakDuration: '40 mins break' },
                         { time: '10:55', city: 'Break City', duration: '4h25m' },
                         { time: '14:30', city: searchParams.get('destination') || '' },
@@ -114,6 +118,7 @@ const ResultsDisplay: React.FC = () => {
                     startTime: '9:30',
                     endTime: '16:45',
                     duration: '7h15m',
+                    distance: '480 km',
                     breaks: 3,
                     breakHours: 120,
                     saving: 7,
@@ -134,6 +139,7 @@ const ResultsDisplay: React.FC = () => {
                     startTime: '11:00',
                     endTime: '16:15',
                     duration: '5h15m',
+                    distance: '420 km',
                     breaks: 1,
                     breakHours: 45,
                     saving: 4,
@@ -152,6 +158,7 @@ const ResultsDisplay: React.FC = () => {
                     startTime: '13:00',
                     endTime: '19:30',
                     duration: '6h30m',
+                    distance: '460 km',
                     breaks: 2,
                     breakHours: 90,
                     saving: 6,
@@ -268,7 +275,7 @@ const ResultsDisplay: React.FC = () => {
                                         )}
                                     </Button>
                                     <div className="text-sm text-gray-500 flex items-center space-x-2">
-                                        <span>Breaks: {result.breaks} | Break min: {result.breakHours} min</span>
+                                        <span>Distance: {result.distance} | Breaks: {result.breaks} | Break min: {result.breakHours} min</span>
                                         {isMostSavings && (
                                             <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
                                                 Most savings

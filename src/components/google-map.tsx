@@ -194,8 +194,15 @@ const darkMapStyle = [
     }
 ]
 
+interface GoogleMapProps {
+    origin?: string;
+    destination?: string;
+}
 
-const GoogleMap = () => {
+const GoogleMap: React.FC<GoogleMapProps> = ({ 
+    origin = "München, Germany", 
+    destination = "Berlin, Germany" 
+}) => {
     const [open, setOpen] = useState(false);
 
     return (
@@ -209,14 +216,22 @@ const GoogleMap = () => {
                         styles: darkMapStyle,
                     }}
                 >
-                    <Directions />
+                    <Directions origin={origin} destination={destination} />
                 </Map>
             </div>
         </APIProvider>
     );
 };
 
-function Directions() {
+interface DirectionsProps {
+    origin?: string;
+    destination?: string;
+}
+
+function Directions({ 
+    origin = "München, Germany", 
+    destination = "Berlin, Germany" 
+}: DirectionsProps) {
     const map = useMap();
     const routesLibrary = useMapsLibrary("routes");
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
@@ -238,8 +253,8 @@ function Directions() {
 
         directionsService
             .route({
-                origin: "100 Front St, Toronto ON",
-                destination: "500 College St, Toronto ON",
+                origin,
+                destination,
                 travelMode: google.maps.TravelMode.DRIVING,
                 provideRouteAlternatives: true,
             })
@@ -248,7 +263,7 @@ function Directions() {
                 setRoutes(response.routes);
             });
 
-    }, [directionsService, directionsRenderer])
+    }, [directionsService, directionsRenderer, origin, destination])
 
     useEffect(() => {
         if (!directionsRenderer) return;
@@ -260,7 +275,7 @@ function Directions() {
 
     return (
         <div className="direction">
-            <h2>{selected?.summary}</h2>
+            {/* <h2>{selected?.summary}</h2>
             <p>
                 {leg.start_address.split(",")[0]} to {leg.end_address.split(",")[0]}
             </p>
@@ -276,7 +291,7 @@ function Directions() {
                         </button>
                     </li>
                 ))}
-            </ul>
+            </ul> */}
         </div>
     );
 }
