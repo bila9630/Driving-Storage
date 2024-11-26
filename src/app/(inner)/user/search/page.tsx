@@ -112,9 +112,10 @@ const SearchPage: React.FC = () => {
       });
 
       if (result.routes[0]?.legs[0]) {
+        const leg = result.routes[0].legs[0];
         setRouteInfo({
-          distance: result.routes[0].legs[0].distance?.text,
-          duration: result.routes[0].legs[0].duration?.text,
+          distance: leg.distance?.text || '',
+          duration: leg.duration?.text || ''
         });
       }
     } catch (error) {
@@ -136,7 +137,7 @@ const SearchPage: React.FC = () => {
     router.push(`/user/result?${searchParams.toString()}`)
   }
 
-  // Add effect to calculate route when both places are selected
+  // Effect to calculate route when both places are selected
   useEffect(() => {
     if (startPlace?.formatted_address && destinationPlace?.formatted_address) {
       calculateRoute(
@@ -166,11 +167,7 @@ const SearchPage: React.FC = () => {
                                     <FormItem className="flex-1">
                                         <FormControl>
                                             <PlaceAutocomplete
-                                                onPlaceSelect={(place) => {
-                                                    if (place?.formatted_address) {
-                                                        field.onChange(place.formatted_address);
-                                                    }
-                                                }}
+                                                onPlaceSelect={setStartPlace}
                                                 placeholder="Start"
                                             />
                                         </FormControl>
@@ -185,11 +182,7 @@ const SearchPage: React.FC = () => {
                                     <FormItem className="flex-1">
                                         <FormControl>
                                             <PlaceAutocomplete
-                                                onPlaceSelect={(place) => {
-                                                    if (place?.formatted_address) {
-                                                        field.onChange(place.formatted_address);
-                                                    }
-                                                }}
+                                                onPlaceSelect={setDestinationPlace}
                                                 placeholder="Destination"
                                             />
                                         </FormControl>
@@ -199,6 +192,16 @@ const SearchPage: React.FC = () => {
                             />
                             <Button type="submit" className="px-8">Search</Button>
                         </div>
+                        {(routeInfo.distance || routeInfo.duration) && (
+                            <div className="flex space-x-4 text-sm text-gray-600">
+                                {routeInfo.distance && (
+                                    <div>Distance: {routeInfo.distance}</div>
+                                )}
+                                {/* {routeInfo.duration && (
+                                    <div>Duration: {routeInfo.duration}</div>
+                                )} */}
+                            </div>
+                        )}
                         <div className="flex space-x-4">
                             <FormField
                                 control={form.control}
