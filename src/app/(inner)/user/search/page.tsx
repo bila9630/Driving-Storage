@@ -82,6 +82,7 @@ const SearchPage: React.FC = () => {
   const [routeInfo, setRouteInfo] = useState<{
     distance?: string;
     duration?: string;
+    durationValue?: number;
   }>({});
 
   // Update form values when places are selected
@@ -115,7 +116,8 @@ const SearchPage: React.FC = () => {
         const leg = result.routes[0].legs[0];
         setRouteInfo({
           distance: leg.distance?.text || '',
-          duration: leg.duration?.text || ''
+          duration: leg.duration?.text || '',
+          durationValue: leg.duration?.value || 0
         });
       }
     } catch (error) {
@@ -133,6 +135,7 @@ const SearchPage: React.FC = () => {
       startTime: data.startTime || '',
       distance: routeInfo.distance || '',
       duration: routeInfo.duration || '',
+      durationValue: routeInfo.durationValue?.toString() || '',
     })
     router.push(`/user/result?${searchParams.toString()}`)
   }

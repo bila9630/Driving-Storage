@@ -85,69 +85,94 @@ const ResultsDisplay: React.FC = () => {
     const [expandedResult, setExpandedResult] = useState<string | null>(null)
 
     useEffect(() => {
-        // Fetch results based on search params
         const fetchResults = async () => {
             const actualDuration = searchParams.get('duration') || '';
+            const actualDurationValue = parseInt(searchParams.get('durationValue') || '0');
             const actualDistance = searchParams.get('distance') || '';
-            
+            const actualStartTime = searchParams.get('startTime') || '8:00';
+
+            // Helper function to add minutes to a time string
+            const addMinutes = (time: string, minutesToAdd: number) => {
+                const [hours, minutes] = time.split(':').map(Number);
+                const totalMinutes = hours * 60 + minutes + minutesToAdd;
+                const newHours = Math.floor(totalMinutes / 60) % 24;
+                const newMinutes = totalMinutes % 60;
+                return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+            };
+
+            // Calculate end time based on start time and duration in seconds
+            const calculateEndTime = (startTime: string, durationSeconds: number) => {
+                const [hours, minutes] = startTime.split(':').map(Number);
+                const durationHours = Math.floor(durationSeconds / 3600);
+                const durationMinutes = Math.floor((durationSeconds % 3600) / 60);
+                let endHours = hours + durationHours;
+                let endMinutes = minutes + durationMinutes;
+                if (endMinutes >= 60) {
+                    endHours += Math.floor(endMinutes / 60);
+                    endMinutes = endMinutes % 60;
+                }
+                endHours = endHours % 24;
+                return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+            };
+
             const mockResults: RouteResult[] = [
                 {
                     id: '1',
                     start: searchParams.get('start') || '',
                     destination: searchParams.get('destination') || '',
                     date: searchParams.get('date') || '',
-                    startTime: '8:00',
-                    endTime: '14:30',
-                    duration: actualDuration || '6h30m',
-                    distance: actualDistance || '450 km',
+                    startTime: actualStartTime,
+                    endTime: calculateEndTime(actualStartTime, actualDurationValue),
+                    duration: actualDuration,
+                    distance: actualDistance,
                     breaks: 2,
-                    breakHours: 95,
+                    breakHours: 90,
                     saving: 5,
                     tripDetails: [
-                        { time: '8:00', city: searchParams.get('start') || '', duration: actualDuration || '2h15m' },
+                        { time: actualStartTime || '8:00', city: searchParams.get('start') || '', duration: actualDuration || '2h15m' },
                         { time: '10:15', city: 'Break City', breakDuration: '40 mins break' },
                         { time: '10:55', city: 'Break City', duration: '4h25m' },
-                        { time: '14:30', city: searchParams.get('destination') || '' },
+                        { time: calculateEndTime(actualStartTime, actualDurationValue), city: searchParams.get('destination') || '' },
                     ]
                 },
                 {
-                    id: '2',
+                    id: '2', // Most savings route (3 breaks)
                     start: searchParams.get('start') || '',
                     destination: searchParams.get('destination') || '',
                     date: searchParams.get('date') || '',
-                    startTime: '9:30',
-                    endTime: '16:45',
-                    duration: '7h15m',
-                    distance: '480 km',
+                    startTime: addMinutes(actualStartTime, 30), // 30 minutes later
+                    endTime: calculateEndTime(addMinutes(actualStartTime, 30), actualDurationValue + 1800), // 30 min longer
+                    duration: actualDuration,
+                    distance: actualDistance,
                     breaks: 3,
                     breakHours: 120,
-                    saving: 7,
+                    saving: 8,
                     tripDetails: [
-                        { time: '9:30', city: searchParams.get('start') || '', duration: '2h30m' },
+                        { time: addMinutes(actualStartTime, 30), city: searchParams.get('start') || '', duration: '2h30m' },
                         { time: '12:00', city: 'Rest Stop A', breakDuration: '45 mins break' },
                         { time: '12:45', city: 'Rest Stop A', duration: '2h' },
                         { time: '14:45', city: 'Rest Stop B', breakDuration: '30 mins break' },
                         { time: '15:15', city: 'Rest Stop B', duration: '1h30m' },
-                        { time: '16:45', city: searchParams.get('destination') || '' },
+                        { time: calculateEndTime(addMinutes(actualStartTime, 30), actualDurationValue + 1800), city: searchParams.get('destination') || '' },
                     ]
                 },
                 {
-                    id: '3',
+                    id: '3', // Shortest duration (1 break)
                     start: searchParams.get('start') || '',
                     destination: searchParams.get('destination') || '',
                     date: searchParams.get('date') || '',
-                    startTime: '11:00',
-                    endTime: '16:15',
-                    duration: '5h15m',
-                    distance: '420 km',
+                    startTime: addMinutes(actualStartTime, -30), // 30 minutes earlier
+                    endTime: calculateEndTime(addMinutes(actualStartTime, -30), actualDurationValue - 1800), // 30 min shorter
+                    duration: actualDuration,
+                    distance: actualDistance,
                     breaks: 1,
                     breakHours: 45,
                     saving: 4,
                     tripDetails: [
-                        { time: '11:00', city: searchParams.get('start') || '', duration: '3h' },
+                        { time: addMinutes(actualStartTime, -30), city: searchParams.get('start') || '', duration: '3h' },
                         { time: '14:00', city: 'Charging Station X', breakDuration: '45 mins break' },
                         { time: '14:45', city: 'Charging Station X', duration: '1h30m' },
-                        { time: '16:15', city: searchParams.get('destination') || '' },
+                        { time: calculateEndTime(addMinutes(actualStartTime, -30), actualDurationValue - 1800), city: searchParams.get('destination') || '' },
                     ]
                 },
                 {
@@ -155,20 +180,20 @@ const ResultsDisplay: React.FC = () => {
                     start: searchParams.get('start') || '',
                     destination: searchParams.get('destination') || '',
                     date: searchParams.get('date') || '',
-                    startTime: '13:00',
-                    endTime: '19:30',
-                    duration: '6h30m',
-                    distance: '460 km',
+                    startTime: addMinutes(actualStartTime, 60), // 60 minutes later
+                    endTime: calculateEndTime(addMinutes(actualStartTime, 60), actualDurationValue + 900), // 15 min longer
+                    duration: actualDuration,
+                    distance: actualDistance,
                     breaks: 2,
-                    breakHours: 90,
+                    breakHours: 85,
                     saving: 6,
                     tripDetails: [
-                        { time: '13:00', city: searchParams.get('start') || '', duration: '2h45m' },
+                        { time: addMinutes(actualStartTime, 60), city: searchParams.get('start') || '', duration: '2h45m' },
                         { time: '15:45', city: 'Service Area Y', breakDuration: '50 mins break' },
                         { time: '16:35', city: 'Service Area Y', duration: '2h' },
                         { time: '18:35', city: 'Quick Stop Z', breakDuration: '40 mins break' },
                         { time: '19:15', city: 'Quick Stop Z', duration: '15m' },
-                        { time: '19:30', city: searchParams.get('destination') || '' },
+                        { time: calculateEndTime(addMinutes(actualStartTime, 60), actualDurationValue + 900), city: searchParams.get('destination') || '' },
                     ]
                 }
             ]
