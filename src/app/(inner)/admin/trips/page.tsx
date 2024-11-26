@@ -13,6 +13,7 @@ import {
 import { PlusCircle, Pencil, Trash2 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 
 interface Trip {
   id: number
@@ -52,16 +53,16 @@ export default function TripsPage() {
     fetchTrips()
   }, [])
 
-  const getStatusStyle = (status: Trip['status']) => {
+  const getStatusBadge = (status: Trip['status']) => {
     switch (status) {
       case 'Completed':
-        return 'border-gray-500 text-gray-500'
+        return <Badge className="bg-green-500">Completed</Badge>
       case 'In Progress':
-        return 'border-yellow-500 text-yellow-500'
+        return <Badge className="bg-blue-500">In Progress</Badge>
       case 'Scheduled':
-        return 'border-indigo-500 text-indigo-500'
+        return <Badge className="bg-yellow-500">Scheduled</Badge>
       case 'Cancelled':
-        return 'border-red-500 text-red-500'
+        return <Badge className="bg-red-500">Cancelled</Badge>
     }
   }
 
@@ -105,16 +106,7 @@ export default function TripsPage() {
               <TableCell>{trip.endLocation}</TableCell>
               <TableCell>{trip.startDate}</TableCell>
               <TableCell>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className={cn(
-                    "border bg-background hover:bg-background",
-                    getStatusStyle(trip.status)
-                  )}
-                >
-                  {trip.status}
-                </Button>
+                {getStatusBadge(trip.status)}
               </TableCell>
               <TableCell>
                 <Button variant="outline" size="icon" className="mr-2">

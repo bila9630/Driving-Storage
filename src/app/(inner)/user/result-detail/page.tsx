@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, CarFront, Goal } from 'lucide-react'
 import GoogleMap from '@/components/google-map'
+import { pb } from '@/lib/pocketbase'
+
 interface RouteResult {
     id: string
     start: string
@@ -29,6 +31,9 @@ const ResultDetailContent: React.FC = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
 
+    // Add loading state
+    const [isLoading, setIsLoading] = useState(false)
+
     // Get and parse all parameters from URL
     const routeDetail: RouteResult = {
         id: searchParams.get('id') || '',
@@ -50,6 +55,29 @@ const ResultDetailContent: React.FC = () => {
         router.push('/user/result')
         return null
     }
+
+    const handleProceedToBooking = async () => {
+        setIsLoading(true)
+        try {
+            // Format the date and time for PocketBase
+            const startDateTime = new Date(`${routeDetail.date} ${routeDetail.startTime}`).toISOString()
+
+            const tripData = {
+                start_location: routeDetail.start,
+                end_location: routeDetail.destination,
+                start_date: startDateTime,
+                status: "Scheduled",
+                driver: "John Doe"
+            }
+
+            await pb.collection('trip').create(tripData)
+            router.push(`/user/confirmation?destination=${routeDetail.destination}`)
+        } catch (error) {
+            console.error('Failed to create trip:', error)
+            setIsLoading(false) // Reset loading state if there's an error
+        }
+    }
+
     return (
         <div className="container mx-auto mt-8">
             <div className="flex items-center mb-6">
@@ -135,7 +163,7 @@ const ResultDetailContent: React.FC = () => {
                     <div className="border-t mt-6 pt-6">
                         <h3 className="font-semibold mb-4">Route Overview</h3>
                         <div className="h-[670px] w-full rounded-lg overflow-hidden border shadow-sm">
-                            <GoogleMap 
+                            <GoogleMap
                                 origin={routeDetail.start}
                                 destination={routeDetail.destination}
                             />
@@ -144,11 +172,12 @@ const ResultDetailContent: React.FC = () => {
                 </CardContent>
             </Card>
             <div className="flex justify-end mb-8">
-                <Button 
+                <Button
                     size="lg"
-                    onClick={() => router.push(`/user/confirmation?destination=${routeDetail.destination}`)}
+                    onClick={handleProceedToBooking}
+                    disabled={isLoading}
                 >
-                    Proceed to Booking
+                    {isLoading ? "Processing..." : "Proceed to Booking"}
                 </Button>
             </div>
         </div>
