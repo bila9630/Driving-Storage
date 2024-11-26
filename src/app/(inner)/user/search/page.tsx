@@ -204,7 +204,7 @@ const SearchPage: React.FC = () => {
                             {(routeInfo.distance || routeInfo.duration) && (
                                 <div className="flex space-x-4 text-sm text-gray-600">
                                     {routeInfo.distance && (
-                                        <div>Distance: {routeInfo.distance}</div>
+                                        <div>Estimated distance: {routeInfo.distance}</div>
                                     )}
                                 </div>
                             )}

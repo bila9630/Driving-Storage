@@ -329,7 +329,7 @@ const ResultCard = ({
                     </div>
                     <div className="flex justify-between text-sm mb-4">
                         <div>{result.start}</div>
-                        <div>{result.destination}</div>
+                        <div className="text-right">{result.destination}</div>
                     </div>
                     <div className="text-sm text-gray-500 mb-2">
                         Duration: {result.duration}
