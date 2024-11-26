@@ -123,9 +123,9 @@ const ResultDetailContent: React.FC = () => {
                     {/* Trip Timeline  */}
                     <div className="border-t pt-4">
                         <h3 className="font-semibold mb-4">Trip Timeline</h3>
-                        <div className="flex space-x-8 overflow-x-auto pb-4">
+                        <div className="flex flex-col md:flex-row justify-center items-center md:items-start space-y-8 md:space-y-0 md:space-x-8 overflow-x-auto pb-4">
                             {routeDetail.tripDetails.map((detail, index) => (
-                                <div key={index} className="flex flex-col items-center min-w-[150px]">
+                                <div key={index} className="flex flex-col items-center min-w-[150px] relative">
                                     <div className="text-sm mb-2">
                                         {detail.time}
                                     </div>
@@ -143,8 +143,9 @@ const ResultDetailContent: React.FC = () => {
                                                 <div className="w-3 h-3 rounded-full border-2 border-gray-300 bg-white" />
                                             )}
                                         </div>
+                                        {/* Line connector - visible only on desktop */}
                                         {index < routeDetail.tripDetails.length - 1 && (
-                                            <div className="absolute top-1/2 left-[130%] h-[2px] w-[150px] bg-gray-300 -translate-y-1/2" />
+                                            <div className="hidden md:block absolute top-1/2 left-[130%] h-[2px] w-[150px] bg-gray-300 -translate-y-1/2" />
                                         )}
                                     </div>
                                     <div className="mt-2 text-center">

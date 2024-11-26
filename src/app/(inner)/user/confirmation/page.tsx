@@ -11,10 +11,10 @@ function ConfirmationContent() {
     const destination = searchParams.get('destination') || 'your destination'
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 md:px-0">
             <MapPinCheck className="w-32 h-32 text-green-500 mb-4" />
             <h1 className="text-3xl font-bold text-center">Booking Confirmed! 🎉</h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-600 text-center">
                 Your trip to {destination} has been confirmed
             </p>
             <Button
