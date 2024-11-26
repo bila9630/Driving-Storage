@@ -9,6 +9,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Search, ArrowUpDown, Pencil, Trash2 } from "lucide-react"
 import { pb } from '@/lib/pocketbase'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface Trip {
     id: string
@@ -28,6 +39,7 @@ const TripsPage: React.FC = () => {
     const [filterStatus, setFilterStatus] = useState('all')
     const [trips, setTrips] = useState<Trip[]>([])
     const [loading, setLoading] = useState(true)
+    const [tripToDelete, setTripToDelete] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchTrips = async () => {
@@ -65,6 +77,19 @@ const TripsPage: React.FC = () => {
         }
     }
 
+    const handleDelete = async () => {
+        if (!tripToDelete) return
+
+        try {
+            await pb.collection('trip').delete(tripToDelete)
+            setTrips(trips.filter(trip => trip.id !== tripToDelete))
+        } catch (error) {
+            console.error('Error deleting trip:', error)
+        } finally {
+            setTripToDelete(null)
+        }
+    }
+
     return (
         <div className="container mx-auto p-6">
             <Card>
@@ -97,7 +122,7 @@ const TripsPage: React.FC = () => {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Date</TableHead>
+                                    <TableHead>Start Date</TableHead>
                                     <TableHead>Start Location</TableHead>
                                     <TableHead>End Location</TableHead>
                                     <TableHead>Status</TableHead>
@@ -115,7 +140,11 @@ const TripsPage: React.FC = () => {
                                             <Button variant="outline" size="icon" className="mr-2">
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="outline" size="icon">
+                                            <Button 
+                                                variant="outline" 
+                                                size="icon"
+                                                onClick={() => setTripToDelete(trip.id)}
+                                            >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </TableCell>
@@ -126,6 +155,24 @@ const TripsPage: React.FC = () => {
                     )}
                 </CardContent>
             </Card>
+
+            <AlertDialog open={!!tripToDelete} onOpenChange={(open) => !open && setTripToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the trip
+                            from the database.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete}>
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
