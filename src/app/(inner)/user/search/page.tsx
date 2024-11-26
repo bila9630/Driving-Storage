@@ -162,62 +162,67 @@ const SearchPage: React.FC = () => {
                 <CardContent>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                            <div className="flex space-x-4">
-                                <FormField
-                                    control={form.control}
-                                    name="start"
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormControl>
-                                                <PlaceAutocomplete
-                                                    onPlaceSelect={setStartPlace}
-                                                    placeholder="Start"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="destination"
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormControl>
-                                                <PlaceAutocomplete
-                                                    onPlaceSelect={setDestinationPlace}
-                                                    placeholder="Destination"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="submit" className="px-8">Search</Button>
+                            <div className="md:flex md:space-x-4 space-y-4 md:space-y-0">
+                                {/* Start and Destination inputs */}
+                                <div className="flex-1 space-y-4 md:space-y-0 md:flex md:space-x-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="start"
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1">
+                                                <FormControl>
+                                                    <PlaceAutocomplete
+                                                        onPlaceSelect={setStartPlace}
+                                                        placeholder="Start"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="destination"
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1">
+                                                <FormControl>
+                                                    <PlaceAutocomplete
+                                                        onPlaceSelect={setDestinationPlace}
+                                                        placeholder="Destination"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                {/* Search button - hidden on mobile */}
+                                <Button type="submit" className="hidden md:inline-flex md:px-8">Search</Button>
                             </div>
+
+                            {/* Route info section */}
                             {(routeInfo.distance || routeInfo.duration) && (
                                 <div className="flex space-x-4 text-sm text-gray-600">
                                     {routeInfo.distance && (
                                         <div>Distance: {routeInfo.distance}</div>
                                     )}
-                                    {/* {routeInfo.duration && (
-                                    <div>Duration: {routeInfo.duration}</div>
-                                )} */}
                                 </div>
                             )}
-                            <div className="flex space-x-4">
+
+                            {/* Date, Time, Breaks */}
+                            <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
                                 <FormField
                                     control={form.control}
                                     name="date"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="flex-1">
                                             <Popover>
                                                 <PopoverTrigger asChild>
                                                     <FormControl>
                                                         <Button
                                                             variant={"outline"}
                                                             className={cn(
-                                                                "w-[240px] justify-start text-left font-normal",
+                                                                "w-full justify-start text-left font-normal",
                                                                 !field.value && "text-muted-foreground"
                                                             )}
                                                         >
@@ -294,6 +299,7 @@ const SearchPage: React.FC = () => {
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger className={cn(
+                                                        "w-full justify-start text-left font-normal",
                                                         !field.value && "text-muted-foreground"
                                                     )}>
                                                         <SelectValue placeholder="Number of breaks" />
@@ -312,6 +318,9 @@ const SearchPage: React.FC = () => {
                                     )}
                                 />
                             </div>
+
+                            {/* Search button - visible only on mobile */}
+                            <Button type="submit" className="w-full md:hidden">Search</Button>
                         </form>
                     </Form>
                 </CardContent>
