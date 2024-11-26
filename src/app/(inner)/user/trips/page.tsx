@@ -97,15 +97,15 @@ const TripsPage: React.FC = () => {
                     <CardTitle className="text-2xl">My Trips</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex space-x-2 mb-4">
+                    <div className="flex flex-col md:flex-row md:space-x-2 space-y-4 md:space-y-0 mb-4">
                         <Input
                             placeholder="Search trips..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="max-w-sm"
+                            className="w-full md:max-w-sm"
                         />
                         <Select value={filterStatus} onValueChange={setFilterStatus}>
-                            <SelectTrigger className="w-[180px]">
+                            <SelectTrigger className="w-full md:w-[180px]">
                                 <SelectValue placeholder="Filter by status" />
                             </SelectTrigger>
                             <SelectContent>

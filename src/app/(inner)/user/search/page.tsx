@@ -299,7 +299,6 @@ const SearchPage: React.FC = () => {
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger className={cn(
-                                                        "w-full justify-start text-left font-normal",
                                                         !field.value && "text-muted-foreground"
                                                     )}>
                                                         <SelectValue placeholder="Number of breaks" />
