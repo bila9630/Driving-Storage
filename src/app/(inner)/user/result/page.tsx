@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PlusCircle, ArrowRight, CarFront, Goal } from 'lucide-react'
 import { ChevronUp, ChevronDown } from 'lucide-react'
+import { cn } from "@/lib/utils"
 
 interface RouteResult {
     id: string
@@ -28,6 +29,14 @@ interface TripDetail {
     city: string
     duration?: string
     breakDuration?: string
+}
+
+interface ResultCardProps {
+    result: RouteResult;
+    expandedResult: string | null;
+    setExpandedResult: (id: string | null) => void;
+    isMostSavings: boolean;
+    isShortestDuration: boolean;
 }
 
 const TripDetails: React.FC<{ result: RouteResult }> = ({ result }) => {
@@ -78,7 +87,7 @@ const TripDetails: React.FC<{ result: RouteResult }> = ({ result }) => {
 // Separate the results display into its own component
 const ResultsDisplay: React.FC = () => {
     const searchParams = useSearchParams()
-    const router = useRouter() 
+    const router = useRouter()
     const [results, setResults] = useState<RouteResult[]>([])
     const [startTime, setStartTime] = useState<string>('')
     const [breaks, setBreaks] = useState<string>('')
@@ -228,16 +237,17 @@ const ResultsDisplay: React.FC = () => {
     }
 
     // Identify trips with the most savings and shortest duration
-    const tripWithMostSavings = results.reduce((prev, current) => (current.saving > prev.saving ? current : prev), results[0])
+    const tripWithMostSavings = results.reduce((prev, current) =>
+        current.saving > prev.saving ? current : prev, results[0])
+
     const tripWithShortestDuration = results.reduce((prev, current) =>
-        parseDuration(current.duration) < parseDuration(prev.duration) ? current : prev, results[0]
-    )
-    
+        parseDuration(current.duration) < parseDuration(prev.duration) ? current : prev, results[0])
+
     return (
         <div>
-            <div className="flex space-x-4 mb-4">
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4 mx-4 md:mx-0">
                 <Select onValueChange={setStartTime} value={startTime}>
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full md:w-[180px]">
                         <SelectValue placeholder="Start time" />
                     </SelectTrigger>
                     <SelectContent>
@@ -248,7 +258,7 @@ const ResultsDisplay: React.FC = () => {
                     </SelectContent>
                 </Select>
                 <Select onValueChange={setBreaks} value={breaks}>
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full md:w-[180px]">
                         <SelectValue placeholder="Number of breaks" />
                     </SelectTrigger>
                     <SelectContent>
@@ -261,89 +271,159 @@ const ResultsDisplay: React.FC = () => {
                     </SelectContent>
                 </Select>
             </div>
-            {filteredResults.map((result) => {
-                const isMostSavings = result.id === tripWithMostSavings?.id;
-                const isShortestDuration = result.id === tripWithShortestDuration?.id;
-
-                return (
-                    <Card
-                        key={result.id}
-                        className={`mb-4 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_15px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] ${
-                            isMostSavings ? 'border-2 border-green-500' : ''
-                        } ${isShortestDuration ? 'border-2 border-blue-500' : ''}`}
-                    >
-                        <CardContent className="p-4">
-                            <div className="flex justify-between items-center mb-2">
-                                <div className="flex flex-col items-start">
-                                    <span className="text-xl font-semibold">{result.startTime}</span>
-                                    <span className="text-sm">{result.start}</span>
-                                </div>
-                                <span className="text-sm text-gray-500">{result.duration}</span>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-xl font-semibold">{result.endTime}</span>
-                                    <span className="text-sm">{result.destination}</span>
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center mt-4">
-                                <div className="flex items-center space-x-4">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setExpandedResult(expandedResult === result.id ? null : result.id)}
-                                        className="flex items-center space-x-1"
-                                    >
-                                        More Info
-                                        {expandedResult === result.id ? (
-                                            <ChevronUp className="w-4 h-4 ml-1" />
-                                        ) : (
-                                            <ChevronDown className="w-4 h-4 ml-1" />
-                                        )}
-                                    </Button>
-                                    <div className="text-sm text-gray-500 flex items-center space-x-2">
-                                        <span>Distance: {result.distance} | Breaks: {result.breaks} | Break min: {result.breakHours} min</span>
-                                        {isMostSavings && (
-                                            <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
-                                                Most savings
-                                            </span>
-                                        )}
-                                        {isShortestDuration && (
-                                            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                                                Shortest duration
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-4">
-                                    <span className="text-xl font-bold"><span className="text-sm text-gray-500">saving:</span> {result.saving} €</span>
-                                    <Button variant="outline"
-                                        onClick={() => {
-                                            const routeParams = new URLSearchParams({
-                                                id: result.id,
-                                                start: result.start,
-                                                destination: result.destination,
-                                                date: result.date,
-                                                startTime: result.startTime,
-                                                endTime: result.endTime,
-                                                duration: result.duration,
-                                                breaks: result.breaks.toString(),
-                                                breakHours: result.breakHours.toString(),
-                                                saving: result.saving.toString(),
-                                                tripDetails: JSON.stringify(result.tripDetails)
-                                            });
-                                            router.push(`/user/result-detail?${routeParams.toString()}`);
-                                        }}>
-                                        Continue
-                                        <ArrowRight className="ml-2 h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                            {expandedResult === result.id && <TripDetails result={result} />}
-                        </CardContent>
-                    </Card>
-                );
-            })}
+            {filteredResults.map((result) => (
+                <ResultCard
+                    key={result.id}
+                    result={result}
+                    expandedResult={expandedResult}
+                    setExpandedResult={setExpandedResult}
+                    isMostSavings={result.id === tripWithMostSavings?.id}
+                    isShortestDuration={result.id === tripWithShortestDuration?.id}
+                />
+            ))}
         </div>
     );
+}
+
+const ResultCard = ({
+    result,
+    expandedResult,
+    setExpandedResult,
+    isMostSavings,
+    isShortestDuration
+}: ResultCardProps) => {
+    const router = useRouter()
+
+    const handleContinue = () => {
+        const routeParams = new URLSearchParams({
+            id: result.id,
+            start: result.start,
+            destination: result.destination,
+            date: result.date,
+            startTime: result.startTime,
+            endTime: result.endTime,
+            duration: result.duration,
+            breaks: result.breaks.toString(),
+            breakHours: result.breakHours.toString(),
+            saving: result.saving.toString(),
+            tripDetails: JSON.stringify(result.tripDetails)
+        });
+        router.push(`/user/result-detail?${routeParams.toString()}`);
+    }
+
+    return (
+        <Card
+            key={result.id}
+            className={cn(
+                "mb-4 mx-4 md:mx-0 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_15px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]",
+                isMostSavings ? 'border-2 border-green-500' : '',
+                isShortestDuration ? 'border-2 border-blue-500' : ''
+            )}
+        >
+            <CardContent className="p-4">
+                {/* Mobile Layout */}
+                <div className="md:hidden">
+                    <div className="flex justify-between items-center mb-2">
+                        <div className="text-xl font-semibold">{result.startTime}</div>
+                        <div className="text-xl font-semibold">{result.endTime}</div>
+                    </div>
+                    <div className="flex justify-between text-sm mb-4">
+                        <div>{result.start}</div>
+                        <div>{result.destination}</div>
+                    </div>
+                    <div className="text-sm text-gray-500 mb-2">
+                        Duration: {result.duration}
+                    </div>
+                    <div className="text-sm text-gray-500 mb-2">
+                        Distance: {result.distance} | Breaks: {result.breaks} | Break min: {result.breakHours} min
+                    </div>
+                    <div className="text-sm text-gray-500 mb-4">
+                        saving: {result.saving} €
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setExpandedResult(expandedResult === result.id ? null : result.id)}
+                            className="flex items-center"
+                        >
+                            More Info
+                            {expandedResult === result.id ? (
+                                <ChevronUp className="w-4 h-4 ml-1" />
+                            ) : (
+                                <ChevronDown className="w-4 h-4 ml-1" />
+                            )}
+                        </Button>
+                        <Button 
+                            variant="outline" 
+                            onClick={handleContinue}
+                        >
+                            Continue
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Desktop Layout - unchanged */}
+                <div className="hidden md:block">
+                    <div className="flex justify-between items-center mb-2">
+                        <div className="flex flex-col items-start">
+                            <span className="text-xl font-semibold">{result.startTime}</span>
+                            <span className="text-sm">{result.start}</span>
+                        </div>
+                        <span className="text-sm text-gray-500">{result.duration}</span>
+                        <div className="flex flex-col items-end">
+                            <span className="text-xl font-semibold">{result.endTime}</span>
+                            <span className="text-sm">{result.destination}</span>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-center mt-4">
+                        <div className="flex items-center space-x-4">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setExpandedResult(expandedResult === result.id ? null : result.id)}
+                                className="flex items-center space-x-1"
+                            >
+                                More Info
+                                {expandedResult === result.id ? (
+                                    <ChevronUp className="w-4 h-4 ml-1" />
+                                ) : (
+                                    <ChevronDown className="w-4 h-4 ml-1" />
+                                )}
+                            </Button>
+                            <div className="text-sm text-gray-500 flex items-center space-x-2">
+                                <span>Distance: {result.distance} | Breaks: {result.breaks} | Break min: {result.breakHours} min</span>
+                                {isMostSavings && (
+                                    <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                                        Most savings
+                                    </span>
+                                )}
+                                {isShortestDuration && (
+                                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                                        Shortest duration
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            <span className="text-xl font-bold"><span className="text-sm text-gray-500">saving:</span> {result.saving} €</span>
+                            <Button 
+                                variant="outline"
+                                onClick={handleContinue}
+                            >
+                                Continue
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Trip Details - works for both layouts */}
+                {expandedResult === result.id && <TripDetails result={result} />}
+            </CardContent>
+        </Card>
+    )
 }
 
 // Main page component
@@ -352,7 +432,7 @@ const ResultPage: React.FC = () => {
 
     return (
         <div className="container mx-auto mt-8">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 mx-4 md:mx-0">
                 <h1 className="text-2xl font-bold">Result</h1>
                 <Button onClick={() => router.push('/user/search')}>
                     <PlusCircle className="mr-2 h-4 w-4" />New Search

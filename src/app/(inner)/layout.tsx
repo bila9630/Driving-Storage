@@ -24,6 +24,10 @@ export default function InnerLayout({ children }: { children: React.ReactNode })
         setIsMobileMenuOpen(false)
     }
 
+    const handleNavClick = () => {
+        setIsMobileMenuOpen(false)
+    }
+
     return (
         <div className="flex flex-col">
             <div className="hidden md:flex border-b">
@@ -57,7 +61,11 @@ export default function InnerLayout({ children }: { children: React.ReactNode })
                 {isMobileMenuOpen && (
                     <div className="border-b pb-4">
                         <div className="flex flex-col">
-                            <MainNav className="flex flex-col space-y-4 px-4" userType={userType} />
+                            <MainNav 
+                                className="flex flex-col space-y-4 px-4" 
+                                userType={userType} 
+                                onNavClick={handleNavClick}
+                            />
                             <div className="mt-4 pt-4 border-t mx-4">
                                 <TeamSwitcher 
                                     onTeamSwitch={handleTeamSwitch} 

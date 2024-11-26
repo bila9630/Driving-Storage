@@ -7,11 +7,13 @@ import { cn } from "@/lib/utils"
 
 interface MainNavProps extends React.HTMLAttributes<HTMLElement> {
     userType: 'admin' | 'driver'
+    onNavClick?: () => void
 }
 
 export function MainNav({
     className,
     userType,
+    onNavClick,
     ...props
 }: MainNavProps) {
     const pathname = usePathname()
@@ -43,6 +45,7 @@ export function MainNav({
                 <Link
                     key={href}
                     href={href}
+                    onClick={onNavClick}
                     className={cn(
                         "text-sm font-medium transition-colors hover:text-primary",
                         "w-full md:w-auto py-2 md:py-0",
