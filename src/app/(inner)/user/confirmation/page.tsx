@@ -3,8 +3,9 @@
 import { useSearchParams, useRouter } from 'next/navigation'
 import { MapPinCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Suspense } from 'react'
 
-export default function ConfirmationPage() {
+function ConfirmationContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const destination = searchParams.get('destination') || 'your destination'
@@ -23,5 +24,18 @@ export default function ConfirmationPage() {
                 Go to Home
             </Button>
         </div>
-    );
+    )
+}
+
+export default function ConfirmationPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+                <MapPinCheck className="w-32 h-32 text-green-500 mb-4" />
+                <h1 className="text-3xl font-bold text-center">Loading...</h1>
+            </div>
+        }>
+            <ConfirmationContent />
+        </Suspense>
+    )
 }
