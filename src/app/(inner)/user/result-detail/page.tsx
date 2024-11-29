@@ -34,6 +34,20 @@ const ResultDetailContent: React.FC = () => {
     // Add loading state
     const [isLoading, setIsLoading] = useState(false)
 
+    // Add helper function to format total duration
+    const formatTotalDuration = (duration: string, breakMinutes: number) => {
+        const match = duration.match(/(\d+)\s*Stunden,\s*(\d+)\s*Minute/)
+        if (!match) return duration
+
+        const [_, hours, minutes] = match
+        const totalMinutes = parseInt(hours) * 60 + parseInt(minutes) + breakMinutes
+
+        const totalHours = Math.floor(totalMinutes / 60)
+        const remainingMinutes = totalMinutes % 60
+
+        return `${totalHours} hours, ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`
+    }
+
     // Get and parse all parameters from URL
     const routeDetail: RouteResult = {
         id: searchParams.get('id') || '',
@@ -100,7 +114,9 @@ const ResultDetailContent: React.FC = () => {
                         </div>
                         <div className="text-center">
                             <h3 className="font-semibold mb-1">Duration</h3>
-                            <p className="text-xl">{routeDetail.duration}</p>
+                            <p className="text-xl">
+                                {formatTotalDuration(routeDetail.duration, routeDetail.breakHours)}
+                            </p>
                             <p className="text-gray-500">{routeDetail.breaks} breaks</p>
                         </div>
                         <div className="text-right">

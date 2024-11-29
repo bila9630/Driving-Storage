@@ -38,5 +38,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Notes
 - UserNav component is unused and can be removed
 - user/auto and user/test are test pages
+- Auslagern formatTotalDuration into lib because it is used in multiple places (result and result-detail)
 
 comment to trigger vercel deploy

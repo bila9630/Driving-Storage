@@ -124,6 +124,26 @@ const ResultsDisplay: React.FC = () => {
                 return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
             };
 
+            // Add new helper function to calculate intermediate times
+            const calculateIntermediateTime = (startTime: string, endTime: string, portion: number) => {
+                const [startHours, startMinutes] = startTime.split(':').map(Number);
+                const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+                const startTotalMinutes = startHours * 60 + startMinutes;
+                let endTotalMinutes = endHours * 60 + endMinutes;
+
+                // Adjust if end time is on next day
+                if (endTotalMinutes < startTotalMinutes) {
+                    endTotalMinutes += 24 * 60;
+                }
+
+                const totalMinutes = startTotalMinutes + (endTotalMinutes - startTotalMinutes) * portion;
+                const hours = Math.floor(totalMinutes / 60) % 24;
+                const minutes = Math.floor(totalMinutes % 60);
+
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            };
+
             const mockResults: RouteResult[] = [
                 {
                     id: '1', // Shortest duration (1 break)
@@ -139,7 +159,15 @@ const ResultsDisplay: React.FC = () => {
                     saving: 4,
                     tripDetails: [
                         { time: addMinutes(actualStartTime, -30), city: searchParams.get('start') || '', duration: '3h' },
-                        { time: '14:00', city: 'Rest Stop A', breakDuration: '45 mins break' },
+                        {
+                            time: calculateIntermediateTime(
+                                addMinutes(actualStartTime, -30),
+                                calculateEndTime(addMinutes(actualStartTime, -30), actualDurationValue - 1800),
+                                0.5
+                            ),
+                            city: 'Rest Stop A',
+                            breakDuration: '45 mins break'
+                        },
                         { time: calculateEndTime(addMinutes(actualStartTime, -30), actualDurationValue - 1800), city: searchParams.get('destination') || '' },
                     ]
                 },
@@ -157,9 +185,33 @@ const ResultsDisplay: React.FC = () => {
                     saving: 8,
                     tripDetails: [
                         { time: addMinutes(actualStartTime, 30), city: searchParams.get('start') || '', duration: '2h30m' },
-                        { time: '12:00', city: 'Rest Stop A', breakDuration: '45 mins break' },
-                        { time: '12:45', city: 'Rest Stop B', breakDuration: '45 mins break' },
-                        { time: '14:45', city: 'Rest Stop C', breakDuration: '30 mins break' },
+                        {
+                            time: calculateIntermediateTime(
+                                addMinutes(actualStartTime, 30),
+                                calculateEndTime(addMinutes(actualStartTime, 30), actualDurationValue + 1800),
+                                0.25
+                            ),
+                            city: 'Rest Stop A',
+                            breakDuration: '45 mins break'
+                        },
+                        {
+                            time: calculateIntermediateTime(
+                                addMinutes(actualStartTime, 30),
+                                calculateEndTime(addMinutes(actualStartTime, 30), actualDurationValue + 1800),
+                                0.5
+                            ),
+                            city: 'Rest Stop B',
+                            breakDuration: '45 mins break'
+                        },
+                        {
+                            time: calculateIntermediateTime(
+                                addMinutes(actualStartTime, 30),
+                                calculateEndTime(addMinutes(actualStartTime, 30), actualDurationValue + 1800),
+                                0.75
+                            ),
+                            city: 'Rest Stop C',
+                            breakDuration: '30 mins break'
+                        },
                         { time: calculateEndTime(addMinutes(actualStartTime, 30), actualDurationValue + 1800), city: searchParams.get('destination') || '' },
                     ]
                 },
@@ -297,9 +349,8 @@ const ResultCard = ({
 }: ResultCardProps) => {
     const router = useRouter()
 
-    // Add this helper function to format the total duration
+    // Update helper function to use English
     const formatTotalDuration = (duration: string, breakMinutes: number) => {
-        // Extract hours and minutes from the duration string
         const match = duration.match(/(\d+)\s*Stunden,\s*(\d+)\s*Minute/)
         if (!match) return duration
 
@@ -309,7 +360,7 @@ const ResultCard = ({
         const totalHours = Math.floor(totalMinutes / 60)
         const remainingMinutes = totalMinutes % 60
 
-        return `${totalHours} Stunden, ${remainingMinutes} Minute${remainingMinutes !== 1 ? 'n' : ''}`
+        return `${totalHours} hours, ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`
     }
 
     const handleContinue = () => {
