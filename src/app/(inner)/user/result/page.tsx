@@ -126,22 +126,21 @@ const ResultsDisplay: React.FC = () => {
 
             const mockResults: RouteResult[] = [
                 {
-                    id: '1',
+                    id: '1', // Shortest duration (1 break)
                     start: searchParams.get('start') || '',
                     destination: searchParams.get('destination') || '',
                     date: searchParams.get('date') || '',
-                    startTime: actualStartTime,
-                    endTime: calculateEndTime(actualStartTime, actualDurationValue),
+                    startTime: addMinutes(actualStartTime, -30), // 30 minutes earlier
+                    endTime: calculateEndTime(addMinutes(actualStartTime, -30), actualDurationValue - 1800), // 30 min shorter
                     duration: actualDuration,
                     distance: actualDistance,
-                    breaks: 2,
-                    breakHours: 90,
-                    saving: 5,
+                    breaks: 1,
+                    breakHours: 45,
+                    saving: 4,
                     tripDetails: [
-                        { time: actualStartTime || '8:00', city: searchParams.get('start') || '', duration: actualDuration || '2h15m' },
-                        { time: '10:15', city: 'Break City', breakDuration: '40 mins break' },
-                        { time: '10:55', city: 'Break City', duration: '4h25m' },
-                        { time: calculateEndTime(actualStartTime, actualDurationValue), city: searchParams.get('destination') || '' },
+                        { time: addMinutes(actualStartTime, -30), city: searchParams.get('start') || '', duration: '3h' },
+                        { time: '14:00', city: 'Rest Stop A', breakDuration: '45 mins break' },
+                        { time: calculateEndTime(addMinutes(actualStartTime, -30), actualDurationValue - 1800), city: searchParams.get('destination') || '' },
                     ]
                 },
                 {
@@ -159,29 +158,28 @@ const ResultsDisplay: React.FC = () => {
                     tripDetails: [
                         { time: addMinutes(actualStartTime, 30), city: searchParams.get('start') || '', duration: '2h30m' },
                         { time: '12:00', city: 'Rest Stop A', breakDuration: '45 mins break' },
-                        { time: '12:45', city: 'Rest Stop A', duration: '2h' },
-                        { time: '14:45', city: 'Rest Stop B', breakDuration: '30 mins break' },
-                        { time: '15:15', city: 'Rest Stop B', duration: '1h30m' },
+                        { time: '12:45', city: 'Rest Stop B', breakDuration: '45 mins break' },
+                        { time: '14:45', city: 'Rest Stop C', breakDuration: '30 mins break' },
                         { time: calculateEndTime(addMinutes(actualStartTime, 30), actualDurationValue + 1800), city: searchParams.get('destination') || '' },
                     ]
                 },
                 {
-                    id: '3', // Shortest duration (1 break)
+                    id: '3',
                     start: searchParams.get('start') || '',
                     destination: searchParams.get('destination') || '',
                     date: searchParams.get('date') || '',
-                    startTime: addMinutes(actualStartTime, -30), // 30 minutes earlier
-                    endTime: calculateEndTime(addMinutes(actualStartTime, -30), actualDurationValue - 1800), // 30 min shorter
+                    startTime: actualStartTime,
+                    endTime: calculateEndTime(actualStartTime, actualDurationValue),
                     duration: actualDuration,
                     distance: actualDistance,
-                    breaks: 1,
-                    breakHours: 45,
-                    saving: 4,
+                    breaks: 2,
+                    breakHours: 90,
+                    saving: 5,
                     tripDetails: [
-                        { time: addMinutes(actualStartTime, -30), city: searchParams.get('start') || '', duration: '3h' },
-                        { time: '14:00', city: 'Charging Station X', breakDuration: '45 mins break' },
-                        { time: '14:45', city: 'Charging Station X', duration: '1h30m' },
-                        { time: calculateEndTime(addMinutes(actualStartTime, -30), actualDurationValue - 1800), city: searchParams.get('destination') || '' },
+                        { time: actualStartTime || '8:00', city: searchParams.get('start') || '', duration: actualDuration || '2h15m' },
+                        { time: '10:15', city: 'Rest Stop A', breakDuration: '45 mins break' },
+                        { time: '10:55', city: 'Rest Stop B', duration: '45 mins break' },
+                        { time: calculateEndTime(actualStartTime, actualDurationValue), city: searchParams.get('destination') || '' },
                     ]
                 },
                 {
@@ -198,10 +196,8 @@ const ResultsDisplay: React.FC = () => {
                     saving: 6,
                     tripDetails: [
                         { time: addMinutes(actualStartTime, 60), city: searchParams.get('start') || '', duration: '2h45m' },
-                        { time: '15:45', city: 'Service Area Y', breakDuration: '50 mins break' },
-                        { time: '16:35', city: 'Service Area Y', duration: '2h' },
-                        { time: '18:35', city: 'Quick Stop Z', breakDuration: '40 mins break' },
-                        { time: '19:15', city: 'Quick Stop Z', duration: '15m' },
+                        { time: '15:45', city: 'Rest Stop A', breakDuration: '40 mins break' },
+                        { time: '16:35', city: 'Rest Stop B', duration: '40 mins break' },
                         { time: calculateEndTime(addMinutes(actualStartTime, 60), actualDurationValue + 900), city: searchParams.get('destination') || '' },
                     ]
                 }
@@ -232,8 +228,15 @@ const ResultsDisplay: React.FC = () => {
     const uniqueBreakCounts = Array.from(new Set(results.map(r => r.breaks))).sort();
 
     const parseDuration = (duration: string): number => {
-        const [hours, minutes] = duration.split('h').map(part => parseInt(part.replace('m', ''), 10) || 0)
-        return hours * 60 + minutes
+        const match = duration.match(/(\d+)\s*Stunden,\s*(\d+)\s*Minute/)
+        if (!match) return 0
+        const [_, hours, minutes] = match
+        return parseInt(hours) * 60 + parseInt(minutes)
+    }
+
+    // Calculate total duration including breaks
+    const getTotalDuration = (result: RouteResult): number => {
+        return parseDuration(result.duration) + result.breakHours
     }
 
     // Identify trips with the most savings and shortest duration
@@ -241,7 +244,7 @@ const ResultsDisplay: React.FC = () => {
         current.saving > prev.saving ? current : prev, results[0])
 
     const tripWithShortestDuration = results.reduce((prev, current) =>
-        parseDuration(current.duration) < parseDuration(prev.duration) ? current : prev, results[0])
+        getTotalDuration(current) < getTotalDuration(prev) ? current : prev, results[0])
 
     return (
         <div>
@@ -294,6 +297,21 @@ const ResultCard = ({
 }: ResultCardProps) => {
     const router = useRouter()
 
+    // Add this helper function to format the total duration
+    const formatTotalDuration = (duration: string, breakMinutes: number) => {
+        // Extract hours and minutes from the duration string
+        const match = duration.match(/(\d+)\s*Stunden,\s*(\d+)\s*Minute/)
+        if (!match) return duration
+
+        const [_, hours, minutes] = match
+        const totalMinutes = parseInt(hours) * 60 + parseInt(minutes) + breakMinutes
+
+        const totalHours = Math.floor(totalMinutes / 60)
+        const remainingMinutes = totalMinutes % 60
+
+        return `${totalHours} Stunden, ${remainingMinutes} Minute${remainingMinutes !== 1 ? 'n' : ''}`
+    }
+
     const handleContinue = () => {
         const routeParams = new URLSearchParams({
             id: result.id,
@@ -332,7 +350,7 @@ const ResultCard = ({
                         <div className="text-right">{result.destination}</div>
                     </div>
                     <div className="text-sm text-gray-500 mb-2">
-                        Duration: {result.duration}
+                        Duration: {formatTotalDuration(result.duration, result.breakHours)} (including breaks)
                     </div>
                     <div className="text-sm text-gray-500 mb-2">
                         Distance: {result.distance} | Breaks: {result.breaks} | Break min: {result.breakHours} min
@@ -354,8 +372,8 @@ const ResultCard = ({
                                 <ChevronDown className="w-4 h-4 ml-1" />
                             )}
                         </Button>
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={handleContinue}
                         >
                             Continue
@@ -371,7 +389,9 @@ const ResultCard = ({
                             <span className="text-xl font-semibold">{result.startTime}</span>
                             <span className="text-sm">{result.start}</span>
                         </div>
-                        <span className="text-sm text-gray-500">{result.duration}</span>
+                        <span className="text-sm text-gray-500">
+                            {formatTotalDuration(result.duration, result.breakHours)}
+                        </span>
                         <div className="flex flex-col items-end">
                             <span className="text-xl font-semibold">{result.endTime}</span>
                             <span className="text-sm">{result.destination}</span>
@@ -408,7 +428,7 @@ const ResultCard = ({
                         </div>
                         <div className="flex items-center space-x-4">
                             <span className="text-xl font-bold"><span className="text-sm text-gray-500">saving:</span> {result.saving} €</span>
-                            <Button 
+                            <Button
                                 variant="outline"
                                 onClick={handleContinue}
                             >
